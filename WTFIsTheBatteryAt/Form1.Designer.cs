@@ -41,6 +41,7 @@
             tabControl1 = new TabControl();
             tabPage1 = new TabPage();
             tabPage2 = new TabPage();
+            checkBox1 = new CheckBox();
             label4 = new Label();
             numericUpDown3 = new NumericUpDown();
             label3 = new Label();
@@ -143,6 +144,7 @@
             // 
             // tabPage2
             // 
+            tabPage2.Controls.Add(checkBox1);
             tabPage2.Controls.Add(label4);
             tabPage2.Controls.Add(numericUpDown3);
             tabPage2.Controls.Add(label3);
@@ -156,6 +158,16 @@
             tabPage2.TabIndex = 1;
             tabPage2.Text = "Settings";
             tabPage2.UseVisualStyleBackColor = true;
+            // 
+            // checkBox1
+            // 
+            checkBox1.AutoSize = true;
+            checkBox1.Location = new Point(11, 37);
+            checkBox1.Name = "checkBox1";
+            checkBox1.Size = new Size(15, 14);
+            checkBox1.TabIndex = 9;
+            checkBox1.UseVisualStyleBackColor = true;
+            checkBox1.CheckedChanged += checkBox1_CheckedChanged;
             // 
             // label4
             // 
@@ -252,5 +264,6 @@
         private NumericUpDown numericUpDown3;
         private System.Windows.Forms.Timer timer2;
         private Label label5;
+        private CheckBox checkBox1;
     }
 }

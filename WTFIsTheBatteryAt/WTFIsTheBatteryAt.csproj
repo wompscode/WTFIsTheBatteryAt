@@ -9,7 +9,7 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <PackageReference Include="Wujek_Dualsense_API" Version="1.4.7" />
+    <PackageReference Include="HidSharp" Version="2.1.0" />
   </ItemGroup>
 
   <ItemGroup>

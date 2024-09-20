@@ -11,5 +11,8 @@
     <Setting Name="TickRate" Type="System.Int32" Scope="User">
       <Value Profile="(Default)">12000</Value>
     </Setting>
+    <Setting Name="ShouldSetLight" Type="System.Boolean" Scope="User">
+      <Value Profile="(Default)">True</Value>
+    </Setting>
   </Settings>
 </SettingsFile>

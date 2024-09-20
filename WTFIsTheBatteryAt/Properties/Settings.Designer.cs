@@ -58,5 +58,17 @@ namespace WTFIsTheBatteryAt.Properties {
                 this["TickRate"] = value;
             }
         }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("True")]
+        public bool ShouldSetLight {
+            get {
+                return ((bool)(this["ShouldSetLight"]));
+            }
+            set {
+                this["ShouldSetLight"] = value;
+            }
+        }
     }
 }
