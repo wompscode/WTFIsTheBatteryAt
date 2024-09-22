@@ -1,12 +1,19 @@
 namespace WTFIsTheBatteryAt
 {
     using HidSharp;
+    using System.Diagnostics;
+    using static Logging;
+    using static Notifications;
+    using static ColourFunctions;
 
+    // WTFIsTheBatteryAt
+    //  Because I didn't want to use PlayStation Accessories anymore.
 
     /*
      * Thanks WujekFoliarz for your work on Wujek-Dualsense-API!
      * I picked it apart because I only needed some functionality of it, and wanted to make this lighter. Your work is well appreciated.
      */
+    
     public partial class Form1 : Form
     {
         public static int controllerPlayer = 0;
@@ -34,6 +41,7 @@ namespace WTFIsTheBatteryAt
         public Form1()
         {
             InitializeComponent();
+            Log("Form1(): Initializing events.");
 
             FormClosing += Form1_FormClosing;
             Resize += Form1_Resize;
@@ -47,16 +55,20 @@ namespace WTFIsTheBatteryAt
         {
             if (WindowState == FormWindowState.Minimized)
             {
+                Log("Form1_Resize(): Hiding window.");
+
                 Hide();
             }
         }
 
         private void Form1_FormClosing(object? sender, FormClosingEventArgs e)
         {
-            Console.WriteLine($"Form1_FormClosing(): Exiting..");
+            Log($"Form1_FormClosing(): Exiting.");
+
             if (dev != null)
             {
-                Console.WriteLine($"Form1_FormClosing(): Triggering dispose");
+                Log($"Form1_FormClosing(): Triggering dispose.");
+
                 DS_Dispose(devNum);
             };
             Properties.Settings.Default.Save();
@@ -66,6 +78,7 @@ namespace WTFIsTheBatteryAt
 
         private void Form1_Load(object sender, EventArgs e)
         {
+            Text = $"WTFIsTheBatteryAt {Program.version}";
 
             pictureBox1.BackColor = dualsenseColor;
             checkBox1.BackColor = dualsenseColor;
@@ -81,29 +94,33 @@ namespace WTFIsTheBatteryAt
             numericUpDown2.Value = warningThreshold;
 
             numericUpDown3.Value = tickRate;
-            timer1.Interval = tickRate;
+            updateTimer.Interval = tickRate;
 #if DEBUG
             tabControl1.Dock = DockStyle.None;
-            label5.Visible = true;
-            timer2.Enabled = true;
+            textBox1.Visible = true;
+            debugTimer.Enabled = true;
 #else
             tabControl1.Dock = DockStyle.Fill;
-            label5.Visible = false;
-            timer2.Enabled = false;
+            textBox1.Visible = false;
+            debugTimer.Enabled = false;
 #endif
         }
 
         public void Tick(bool warning = false)
         {
-            Console.WriteLine("Tick(): Reached.");
-            if (dev == null) return; else Console.WriteLine("Tick(): Device is not null");
+            Log("Tick(): Reached.");
 
+            if (dev == null) return;
+            else
+            {
+                Log("Tick(): Device is not null.");
+            }
             DS_ReadData();
 
             string _batStateTextFull = "??";
             string _batStateTextSmall = "?";
 
-            switch(devBatteryState)
+            switch (devBatteryState)
             {
                 case BatteryState.POWER_SUPPLY_STATUS_DISCHARGING:
                     _batStateTextFull = "discharging";
@@ -136,7 +153,7 @@ namespace WTFIsTheBatteryAt
 
             if (devBatteryPercent < warningThreshold && warned == false && warning == true)
             {
-                ShowNotification($"Battery below {warningThreshold}%, current: {devBatteryPercent}%", 2);
+                ShowNotification(notifyIcon1, "WTFIsTheBatteryAt", $"Battery below {warningThreshold}%, current: {devBatteryPercent}%", 2);
 
                 warned = true;
             }
@@ -146,17 +163,27 @@ namespace WTFIsTheBatteryAt
 
         private void DS_GetDev(int controller = 0)
         {
+            Log($"DS_GetDev(): Reached.");
+            if (dev != null)
+            {
+                Log($"DS_GetDev(): Previous dev present - disposing.");
+                dev.Dispose();
+            }
             List<HidDevice> devices = new List<HidDevice>();
             foreach (var dev in DeviceList.Local.GetHidDevices())
             {
                 if (dev.VendorID == 1356 && dev.ProductID == 3302)
                 {
                     devices.Add(dev);
+                    Log($"DS_GetDev(): DualSense detected (1356&3302)");
+
                     // DualSense
                 }
                 else if (dev.VendorID == 1356 && dev.ProductID == 3570)
                 {
                     devices.Add(dev);
+                    Log($"DS_GetDev(): DualSense Edge detected (1356&3570)");
+                    
                     // DualSense Edge
                 }
             }
@@ -174,11 +201,14 @@ namespace WTFIsTheBatteryAt
                     devBT = devLength >= 78;
                 else
                     devBT = devLength >= 94;
+
+                Log($"DS_GetDev(): New controller info: " +
+                    $"{(devROE ? "DualSense Edge" : "DualSense")}: {devNum} {(devBT ? "(BT)" : "(USB)")}");
             }
             catch (Exception ex)
             {
-                Console.WriteLine(ex.StackTrace);
-                throw new Exception("Couldn't connect controller.");
+                Log($"DS_GetDev(): Run into problem connecting controller: \n{ex.StackTrace}");
+                throw new Exception("Couldn't connect controller.\n" + ex.StackTrace);
             }
         }
         public enum BatteryState
@@ -195,23 +225,25 @@ namespace WTFIsTheBatteryAt
         }
         private void DS_ReadData()
         {
-            Console.WriteLine($"DS_ReadData(): Reached.");
+            Log($"DS_ReadData(): Reached.");
 
             try
             {
                 if (dev == null) return;
-                Console.WriteLine($"DS_ReadData(): dev not null");
+                Log($"DS_ReadData(): Device is not null.");
+
                 byte[] deviceStates = new byte[devLength];
                 dev.Read(deviceStates);
-                int tempOffset = 0;
-                if (devBT) tempOffset = 1;
+                int tempOffset = devBT ? 1 : 0;
 
                 byte faceButtons = deviceStates[8 + tempOffset];
-                Console.WriteLine($"DS_ReadData(): cross: {(faceButtons & (1 << 5)) != 0}"); // For debug purposes.
+                Log($"DS_ReadData(): X: {(faceButtons & (1 << 5)) != 0}"); // For debug purposes.
+
 
                 if (devBT)
                 {
-                    Console.WriteLine($"DS_ReadData(): {(BatteryState)((byte)(deviceStates[53 + tempOffset] & 0xF0) >> 4)}");
+                    Log($"DS_ReadData(): STATE: {(BatteryState)((byte)(deviceStates[53 + tempOffset] & 0xF0) >> 4)}");
+                    Log($"DS_ReadData(): PERCENT: {Math.Min((int)((deviceStates[53 + tempOffset] & 0x0F) * 10 + 5), 100)}%");
 
                     devBatteryState = (BatteryState)((byte)(deviceStates[53 + tempOffset] & 0xF0) >> 4);
                     devBatteryPercent = Math.Min((int)((deviceStates[53 + tempOffset] & 0x0F) * 10 + 5), 100);
@@ -225,7 +257,9 @@ namespace WTFIsTheBatteryAt
             }
             catch (Exception exception)
             {
-                Console.WriteLine(exception.Message);
+
+                Log(exception.Message);
+
                 OnDisconnect();
                 DS_Dispose(devNum);
             }
@@ -233,12 +267,13 @@ namespace WTFIsTheBatteryAt
 
         private void DS_WriteData(Color col)
         {
-            Console.WriteLine("DS_WriteData(): Reached.");
+            Log("DS_WriteData(): Reached.");
+
             byte[] outputDevStates = new byte[devLength];
 
             if (devBT)
             {
-                Console.WriteLine($"DS_WriteData(): devBT true");
+                Log($"DS_WriteData(): Device is connected via BT");
 
                 int[] rtf = new int[7];
                 int[] ltf = new int[7];
@@ -287,7 +322,8 @@ namespace WTFIsTheBatteryAt
             }
             else
             {
-                Console.WriteLine($"DS_WriteData(): devBT false");
+
+                Log($"DS_WriteData(): Device is not connected via BT");
 
                 int[] rtf = new int[7];
                 int[] ltf = new int[7];
@@ -330,14 +366,18 @@ namespace WTFIsTheBatteryAt
 
             try
             {
-                Console.WriteLine($"DS_WriteData(): trying to write to device");
+                Log($"DS_WriteData(): Trying to write to device");
 
-                if (dev != null) dev.WriteAsync(outputDevStates, 0, devLength); else Console.WriteLine("DS_WriteData(): device is null?");
+                if (dev != null) dev.WriteAsync(outputDevStates, 0, devLength);
+                else
+                {
+                    Log("DS_WriteData(): Device is null?");
+                }
             }
             catch (Exception exception)
             {
-                Console.WriteLine($"DS_WriteData(): failed to write to device");
-                Console.WriteLine(exception.StackTrace);
+                Log($"DS_WriteData(): Failed to write to device");
+                if (exception.StackTrace != null) Log(exception.StackTrace);
             }
         }
 
@@ -345,22 +385,24 @@ namespace WTFIsTheBatteryAt
         {
             if (dev != null)
             {
-                Console.WriteLine("DS_Dispose(): colour reset");
+                Log("DS_Dispose(): Colour reset.");
+
                 DS_WriteData(Color.Blue);
 
                 dev.Dispose();
-                Console.WriteLine("DS_Dispose(): device disposed");
+                Log("DS_Dispose(): Device disposed.");
             };
         }
 
         private void OnDisconnect()
         {
-            button1.Text = "Connect";
+            Log("OnDisconnect(): Disconnected.");
+
             dualsenseStarted = false;
             warned = false;
             label1.Text = "";
-            timer1.Stop();
-
+            updateTimer.Stop();
+            connectionTimer.Start();
             notifyIcon1.Text = "WTFITBA: disconnected";
         }
 
@@ -368,66 +410,44 @@ namespace WTFIsTheBatteryAt
         {
             if (dualsenseStarted)
             {
-                button1.Text = "Connect";
-                dualsenseStarted = false;
-                warned = false;
-                label1.Text = "";
-                timer1.Stop();
+                try
+                {
+                    // Dispose original controller.
+                    DS_Dispose(devNum);
+                    // Get new controller.
+                    DS_GetDev(controllerPlayer);
 
-                notifyIcon1.Text = "WTFITBA: disconnected";
-                if (dev != null) DS_Dispose(controllerPlayer);
-                return;
-            }
-            try
-            {
-                DS_GetDev(controllerPlayer);
-            }
-            catch
-            {
-                ShowNotification($"Failed to find Dualsense at player {controllerPlayer}. Is there one connected?", 3);
-            }
+                    if (dev != null)
+                    {
+                        dualsenseStarted = true;
+                        warned = false;
 
-            if (dev != null)
-            {
+                        Tick();
 
-                button1.Text = "Disconnect";
+                        Log("[info: DS_WriteData() is called twice to send the init packet, so all functionality works]");
 
-                dualsenseStarted = true;
-                warned = false;
+                        if (devBTInit == false) DS_WriteData(Color.Blue); // Incase it's not been initialized.
+                        DS_WriteData(dualsenseColor);
 
-                Thread.Sleep(10);
-                Tick();
-                if (devBTInit == false) DS_WriteData(Color.Blue); // Incase it's not been initialized.
-                DS_WriteData(dualsenseColor);
+                        // Restart updateTimer
+                        updateTimer.Stop();
+                        updateTimer.Start();
+                    }
+                }
+                catch
+                {
+                    dualsenseStarted = false;
+                    warned = false;
+                    updateTimer.Stop();
 
-                timer1.Start();
+                    numericUpDown1.Value = 0;
+                    controllerPlayer = 0;
+                    connectionTimer.Start();
+                }
             }
         }
 
-        private void ShowNotification(string text, int iconType = 0)
-        {
-            switch (iconType)
-            {
-                case 0:
-                    notifyIcon1.BalloonTipIcon = ToolTipIcon.None;
-                    break;
-                case 1:
-                    notifyIcon1.BalloonTipIcon = ToolTipIcon.Info;
-                    break;
-                case 2:
-                    notifyIcon1.BalloonTipIcon = ToolTipIcon.Warning;
-                    break;
-                case 3:
-                    notifyIcon1.BalloonTipIcon = ToolTipIcon.Error;
-                    break;
-            }
-
-            notifyIcon1.BalloonTipText = text;
-            notifyIcon1.BalloonTipTitle = "WTFIsTheBatteryAt";
-            notifyIcon1.ShowBalloonTip(0);
-        }
-
-        private void timer1_Tick(object sender, EventArgs e)
+        private void updateTimer_Tick(object sender, EventArgs e)
         {
             Tick(true);
         }
@@ -435,17 +455,6 @@ namespace WTFIsTheBatteryAt
         private void numericUpDown1_ValueChanged(object sender, EventArgs e)
         {
             controllerPlayer = (int)numericUpDown1.Value;
-        }
-
-        public Color IdealTextColor(Color bg)
-        {
-            // Borrowed from https://www.codeproject.com/Articles/16565/Determining-Ideal-Text-Color-Based-on-Specified-Ba (thanks guys!)
-            int nThreshold = 105;
-            int bgDelta = Convert.ToInt32((bg.R * 0.299) + (bg.G * 0.587) +
-                                          (bg.B * 0.114));
-
-            Color foreColor = (255 - bgDelta < nThreshold) ? Color.Black : Color.White;
-            return foreColor;
         }
 
         private void pictureBox1_Click(object sender, EventArgs e)
@@ -476,21 +485,24 @@ namespace WTFIsTheBatteryAt
 
         private void notifyIcon1_MouseDoubleClick(object sender, MouseEventArgs e)
         {
+            Log("notifyIcon1_MouseDoubleClick(): Showing window.");
+
             Show();
             WindowState = FormWindowState.Normal;
         }
 
         private void NumericUpDown2_Enter(object? sender, EventArgs e)
         {
-            if (dualsenseStarted) timer1.Stop();
+            if (dualsenseStarted) updateTimer.Stop();
         }
 
         private void NumericUpDown2_Leave(object? sender, EventArgs e)
         {
             Properties.Settings.Default.Save();
 
-            if (dualsenseStarted) { timer1.Start(); warned = false; }
+            if (dualsenseStarted) { updateTimer.Start(); warned = false; }
         }
+
         private void numericUpDown2_ValueChanged(object sender, EventArgs e)
         {
             warningThreshold = (int)numericUpDown2.Value;
@@ -500,28 +512,36 @@ namespace WTFIsTheBatteryAt
 
         private void NumericUpDown3_Enter(object? sender, EventArgs e)
         {
-            if (dualsenseStarted) timer1.Stop();
+            if (dualsenseStarted) updateTimer.Stop();
         }
 
         private void NumericUpDown3_Leave(object? sender, EventArgs e)
         {
             Properties.Settings.Default.Save();
 
-            if (dualsenseStarted) timer1.Start();
+            if (dualsenseStarted) updateTimer.Start();
         }
 
         private void numericUpDown3_ValueChanged(object sender, EventArgs e)
         {
             tickRate = (int)numericUpDown3.Value;
 
-            timer1.Interval = tickRate;
+            updateTimer.Interval = tickRate;
 
             Properties.Settings.Default.TickRate = (int)numericUpDown3.Value;
         }
 
-        private void timer2_Tick(object sender, EventArgs e)
+        private void debugTimer_Tick(object sender, EventArgs e)
         {
-            label5.Text = $"Timer1: {timer1.Enabled}\nInterval: {timer1.Interval}\nBS: {devBatteryState}";
+            textBox1.Text = $"Timer1: {updateTimer.Enabled}" +
+                $"{Environment.NewLine}" +
+                $"Interval: {updateTimer.Interval}" +
+                $"{Environment.NewLine}" +
+                $"BS: {devBatteryState}" +
+                $"{Environment.NewLine}" +
+                $"connectionTimer: {connectionTimer.Enabled}" +
+                $"{Environment.NewLine}" +
+                $"windowUpdateTimer: {windowUpdateTimer.Enabled}";
         }
 
         private void checkBox1_CheckedChanged(object sender, EventArgs e)
@@ -529,6 +549,94 @@ namespace WTFIsTheBatteryAt
             Properties.Settings.Default.ShouldSetLight = checkBox1.Checked;
             Properties.Settings.Default.Save();
 
+        }
+
+        private void connectionTimer_Tick(object sender, EventArgs e)
+        {
+            try
+            {
+                if (!dualsenseStarted)
+                {
+                    Log("connectionTimer_Tick(): Attempting to connect controller.");
+
+
+                    DS_GetDev(controllerPlayer);
+                    if (dev == null) return;
+
+                    Log("connectionTimer_Tick(): Controller found.");
+
+                    dualsenseStarted = true;
+
+                    Tick();
+
+                    Log("[info: DS_WriteData() is called twice to send the init packet, so all functionality works]");
+                    if (devBTInit == false) DS_WriteData(Color.Blue); // In case it's not been initialized.
+                    DS_WriteData(dualsenseColor);
+
+                    updateTimer.Start();
+                    connectionTimer.Stop();
+                }
+            }
+            catch (Exception ex)
+            {
+                if (!ex.Message.StartsWith("Couldn't connect controller."))
+                {
+                    MessageBox.Show("Something has happened, and I have no idea what to do from here.\n" + ex.StackTrace);
+                    Application.Exit();
+                }
+                else
+                {
+                    Log("connectionTimer_Tick(): No controller.");
+                }
+            }
+        }
+
+        private void windowUpdateTimer_Tick(object sender, EventArgs e)
+        {
+            if (dualsenseStarted)
+            {
+                button1.Text = "Reconnect";
+                button1.Visible = true;
+                label1.Location = new Point(3, 32);
+
+                numericUpDown1.Visible = true;
+            }
+            else
+            {
+                button1.Visible = false;
+                label1.Text = "Waiting..";
+                label1.Location = new Point(3, 3);
+
+                notifyIcon1.Text = "WTFITBA: disconnected";
+                numericUpDown1.Visible = false;
+            }
+        }
+
+        private void linkLabel1_LinkClicked(object sender, LinkLabelLinkClickedEventArgs e)
+        {
+            Process page = new Process();
+            page.StartInfo.UseShellExecute = true;
+            page.StartInfo.FileName = "https://github.com/wompscode/WTFIsTheBatteryAt";
+            page.Start();
+        }
+
+        private void label3_Click(object sender, EventArgs e)
+        {
+            if (Program.debug)
+            {
+                MessageBox.Show("You are already running WTFITBA in debug mode. Restart with no arguments to disable it.");
+                return;
+            }
+            DialogResult dialogResult = MessageBox.Show("Restart WTFITBA with debug functionality?", "WTFIsTheBatteryAt", MessageBoxButtons.YesNo);
+            if (dialogResult == DialogResult.Yes)
+            {
+                Process process = new Process();
+                process.StartInfo.UseShellExecute = true;
+                process.StartInfo.FileName = Application.ExecutablePath;
+                process.StartInfo.Arguments = "--debug";
+                process.Start();
+                Environment.Exit(0);
+            }
         }
     }
 }

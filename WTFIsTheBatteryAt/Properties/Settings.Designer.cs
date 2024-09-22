@@ -25,7 +25,7 @@ namespace WTFIsTheBatteryAt.Properties {
         
         [global::System.Configuration.UserScopedSettingAttribute()]
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
-        [global::System.Configuration.DefaultSettingValueAttribute("MediumPurple")]
+        [global::System.Configuration.DefaultSettingValueAttribute("DeepPink")]
         public global::System.Drawing.Color LightbarColour {
             get {
                 return ((global::System.Drawing.Color)(this["LightbarColour"]));
@@ -49,7 +49,7 @@ namespace WTFIsTheBatteryAt.Properties {
         
         [global::System.Configuration.UserScopedSettingAttribute()]
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
-        [global::System.Configuration.DefaultSettingValueAttribute("12000")]
+        [global::System.Configuration.DefaultSettingValueAttribute("5000")]
         public int TickRate {
             get {
                 return ((int)(this["TickRate"]));

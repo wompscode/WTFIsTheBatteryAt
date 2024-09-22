@@ -3,13 +3,13 @@
   <Profiles />
   <Settings>
     <Setting Name="LightbarColour" Type="System.Drawing.Color" Scope="User">
-      <Value Profile="(Default)">MediumPurple</Value>
+      <Value Profile="(Default)">DeepPink</Value>
     </Setting>
     <Setting Name="WarningThreshold" Type="System.Int32" Scope="User">
       <Value Profile="(Default)">25</Value>
     </Setting>
     <Setting Name="TickRate" Type="System.Int32" Scope="User">
-      <Value Profile="(Default)">12000</Value>
+      <Value Profile="(Default)">5000</Value>
     </Setting>
     <Setting Name="ShouldSetLight" Type="System.Boolean" Scope="User">
       <Value Profile="(Default)">True</Value>

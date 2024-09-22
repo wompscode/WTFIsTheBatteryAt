@@ -33,7 +33,7 @@
             numericUpDown1 = new NumericUpDown();
             button1 = new Button();
             label1 = new Label();
-            timer1 = new System.Windows.Forms.Timer(components);
+            updateTimer = new System.Windows.Forms.Timer(components);
             notifyIcon1 = new NotifyIcon(components);
             colorDialog1 = new ColorDialog();
             pictureBox1 = new PictureBox();
@@ -41,13 +41,16 @@
             tabControl1 = new TabControl();
             tabPage1 = new TabPage();
             tabPage2 = new TabPage();
+            linkLabel1 = new LinkLabel();
             checkBox1 = new CheckBox();
             label4 = new Label();
             numericUpDown3 = new NumericUpDown();
             label3 = new Label();
             numericUpDown2 = new NumericUpDown();
-            label5 = new Label();
-            timer2 = new System.Windows.Forms.Timer(components);
+            debugTimer = new System.Windows.Forms.Timer(components);
+            connectionTimer = new System.Windows.Forms.Timer(components);
+            windowUpdateTimer = new System.Windows.Forms.Timer(components);
+            textBox1 = new TextBox();
             ((System.ComponentModel.ISupportInitialize)numericUpDown1).BeginInit();
             ((System.ComponentModel.ISupportInitialize)pictureBox1).BeginInit();
             tabControl1.SuspendLayout();
@@ -73,7 +76,7 @@
             button1.Name = "button1";
             button1.Size = new Size(103, 23);
             button1.TabIndex = 1;
-            button1.Text = "Connect";
+            button1.Text = "Reconnect";
             button1.UseVisualStyleBackColor = true;
             button1.Click += button1_Click;
             // 
@@ -86,10 +89,10 @@
             label1.TabIndex = 2;
             label1.Text = "Battery: 000% [discharging]";
             // 
-            // timer1
+            // updateTimer
             // 
-            timer1.Interval = 12000;
-            timer1.Tick += timer1_Tick;
+            updateTimer.Interval = 12000;
+            updateTimer.Tick += updateTimer_Tick;
             // 
             // notifyIcon1
             // 
@@ -101,10 +104,11 @@
             // 
             // pictureBox1
             // 
+            pictureBox1.Anchor = AnchorStyles.Top | AnchorStyles.Left | AnchorStyles.Right;
             pictureBox1.BackColor = Color.Black;
             pictureBox1.Location = new Point(6, 6);
             pictureBox1.Name = "pictureBox1";
-            pictureBox1.Size = new Size(148, 50);
+            pictureBox1.Size = new Size(297, 50);
             pictureBox1.TabIndex = 3;
             pictureBox1.TabStop = false;
             pictureBox1.Click += pictureBox1_Click;
@@ -126,7 +130,7 @@
             tabControl1.Location = new Point(0, 0);
             tabControl1.Name = "tabControl1";
             tabControl1.SelectedIndex = 0;
-            tabControl1.Size = new Size(167, 183);
+            tabControl1.Size = new Size(319, 183);
             tabControl1.TabIndex = 5;
             // 
             // tabPage1
@@ -137,13 +141,14 @@
             tabPage1.Location = new Point(4, 24);
             tabPage1.Name = "tabPage1";
             tabPage1.Padding = new Padding(3);
-            tabPage1.Size = new Size(159, 155);
+            tabPage1.Size = new Size(311, 155);
             tabPage1.TabIndex = 0;
             tabPage1.Text = "Main";
             tabPage1.UseVisualStyleBackColor = true;
             // 
             // tabPage2
             // 
+            tabPage2.Controls.Add(linkLabel1);
             tabPage2.Controls.Add(checkBox1);
             tabPage2.Controls.Add(label4);
             tabPage2.Controls.Add(numericUpDown3);
@@ -154,10 +159,22 @@
             tabPage2.Location = new Point(4, 24);
             tabPage2.Name = "tabPage2";
             tabPage2.Padding = new Padding(3);
-            tabPage2.Size = new Size(159, 155);
+            tabPage2.Size = new Size(311, 155);
             tabPage2.TabIndex = 1;
             tabPage2.Text = "Settings";
             tabPage2.UseVisualStyleBackColor = true;
+            // 
+            // linkLabel1
+            // 
+            linkLabel1.Anchor = AnchorStyles.Bottom | AnchorStyles.Right;
+            linkLabel1.AutoSize = true;
+            linkLabel1.Location = new Point(258, 133);
+            linkLabel1.Name = "linkLabel1";
+            linkLabel1.Size = new Size(45, 15);
+            linkLabel1.TabIndex = 10;
+            linkLabel1.TabStop = true;
+            linkLabel1.Text = "GitHub";
+            linkLabel1.LinkClicked += linkLabel1_LinkClicked;
             // 
             // checkBox1
             // 
@@ -195,6 +212,7 @@
             label3.Size = new Size(68, 15);
             label3.TabIndex = 6;
             label3.Text = "Warning %:";
+            label3.Click += label3_Click;
             // 
             // numericUpDown2
             // 
@@ -204,33 +222,43 @@
             numericUpDown2.TabIndex = 5;
             numericUpDown2.ValueChanged += numericUpDown2_ValueChanged;
             // 
-            // label5
+            // debugTimer
             // 
-            label5.AutoSize = true;
-            label5.Location = new Point(10, 186);
-            label5.Name = "label5";
-            label5.Size = new Size(38, 15);
-            label5.TabIndex = 3;
-            label5.Text = "label5";
+            debugTimer.Interval = 250;
+            debugTimer.Tick += debugTimer_Tick;
             // 
-            // timer2
+            // connectionTimer
             // 
-            timer2.Interval = 250;
-            timer2.Tick += timer2_Tick;
+            connectionTimer.Enabled = true;
+            connectionTimer.Interval = 2500;
+            connectionTimer.Tick += connectionTimer_Tick;
+            // 
+            // windowUpdateTimer
+            // 
+            windowUpdateTimer.Enabled = true;
+            windowUpdateTimer.Tick += windowUpdateTimer_Tick;
+            // 
+            // textBox1
+            // 
+            textBox1.Location = new Point(321, 24);
+            textBox1.Multiline = true;
+            textBox1.Name = "textBox1";
+            textBox1.ReadOnly = true;
+            textBox1.Size = new Size(151, 155);
+            textBox1.TabIndex = 6;
             // 
             // Form1
             // 
             AutoScaleDimensions = new SizeF(7F, 15F);
             AutoScaleMode = AutoScaleMode.Font;
-            ClientSize = new Size(166, 186);
-            Controls.Add(label5);
+            ClientSize = new Size(319, 186);
+            Controls.Add(textBox1);
             Controls.Add(tabControl1);
             Icon = (Icon)resources.GetObject("$this.Icon");
-            MaximizeBox = false;
-            MinimumSize = new Size(182, 225);
+            MaximumSize = new Size(500, 300);
+            MinimumSize = new Size(335, 225);
             Name = "Form1";
-            ShowIcon = false;
-            Text = "WTFITBA";
+            Text = "WTFIsTheBatteryAt 0.0.0";
             Load += Form1_Load;
             ((System.ComponentModel.ISupportInitialize)numericUpDown1).EndInit();
             ((System.ComponentModel.ISupportInitialize)pictureBox1).EndInit();
@@ -250,7 +278,7 @@
         private NumericUpDown numericUpDown1;
         private Button button1;
         private Label label1;
-        private System.Windows.Forms.Timer timer1;
+        private System.Windows.Forms.Timer updateTimer;
         private NotifyIcon notifyIcon1;
         private ColorDialog colorDialog1;
         private PictureBox pictureBox1;
@@ -262,8 +290,11 @@
         private NumericUpDown numericUpDown2;
         private Label label4;
         private NumericUpDown numericUpDown3;
-        private System.Windows.Forms.Timer timer2;
-        private Label label5;
+        private System.Windows.Forms.Timer debugTimer;
         private CheckBox checkBox1;
+        private System.Windows.Forms.Timer connectionTimer;
+        private System.Windows.Forms.Timer windowUpdateTimer;
+        private LinkLabel linkLabel1;
+        private TextBox textBox1;
     }
 }
