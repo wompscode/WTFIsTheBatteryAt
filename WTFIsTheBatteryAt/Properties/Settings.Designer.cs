@@ -70,5 +70,41 @@ namespace WTFIsTheBatteryAt.Properties {
                 this["ShouldSetLight"] = value;
             }
         }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("MS Gothic, 8.25pt")]
+        public global::System.Drawing.Font TrayFont {
+            get {
+                return ((global::System.Drawing.Font)(this["TrayFont"]));
+            }
+            set {
+                this["TrayFont"] = value;
+            }
+        }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("White")]
+        public global::System.Drawing.Color TrayColour {
+            get {
+                return ((global::System.Drawing.Color)(this["TrayColour"]));
+            }
+            set {
+                this["TrayColour"] = value;
+            }
+        }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("-1, 4")]
+        public global::System.Drawing.Point TrayOffset {
+            get {
+                return ((global::System.Drawing.Point)(this["TrayOffset"]));
+            }
+            set {
+                this["TrayOffset"] = value;
+            }
+        }
     }
 }

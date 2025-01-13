@@ -10,7 +10,7 @@ namespace WTFIsTheBatteryAt
         [return: MarshalAs(UnmanagedType.Bool)]
         static extern bool AllocConsole();
 
-        public static string version = "1.0.3";
+        public static string version = "1.0.4";
 
         public static bool debug = false;
 

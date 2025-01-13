@@ -14,5 +14,14 @@
     <Setting Name="ShouldSetLight" Type="System.Boolean" Scope="User">
       <Value Profile="(Default)">True</Value>
     </Setting>
+    <Setting Name="TrayFont" Type="System.Drawing.Font" Scope="User">
+      <Value Profile="(Default)">MS Gothic, 8.25pt</Value>
+    </Setting>
+    <Setting Name="TrayColour" Type="System.Drawing.Color" Scope="User">
+      <Value Profile="(Default)">White</Value>
+    </Setting>
+    <Setting Name="TrayOffset" Type="System.Drawing.Point" Scope="User">
+      <Value Profile="(Default)">-1, 4</Value>
+    </Setting>
   </Settings>
 </SettingsFile>
