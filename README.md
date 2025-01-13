@@ -1,9 +1,6 @@
-# WTFIsTheBatteryAt
-I got sick of PlayStation Accessories, so this now exists.  
-Compile and use it as you want.  
+# ![logo](logo_128.png) WTFIsTheBatteryAt 
+I didn't like PlayStation Accessories, and wanted a better way to see my battery usage. Now we're here.  
 
-The icon is not pretty, but I'll probably update it eventually. (maybe)  
-  
 # Debugging
 If you would like to view logs via console, go into the settings of the Project Solution, and set the Application Type to `Console Application`.  
 The application will function identically, just with a console in the background.

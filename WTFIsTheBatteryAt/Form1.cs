@@ -13,7 +13,7 @@ namespace WTFIsTheBatteryAt
      * Thanks WujekFoliarz for your work on Wujek-Dualsense-API!
      * I picked it apart because I only needed some functionality of it, and wanted to make this lighter. Your work is well appreciated.
      */
-    
+
     public partial class Form1 : Form
     {
         public static int controllerPlayer = 0;
@@ -22,7 +22,10 @@ namespace WTFIsTheBatteryAt
         public static Color dualsenseColor = Properties.Settings.Default.LightbarColour;
         public static int warningThreshold = Properties.Settings.Default.WarningThreshold;
         public static int tickRate = Properties.Settings.Default.TickRate;
-
+        public static Color trayColor = Properties.Settings.Default.TrayColour;
+        public static Point trayOffset = Properties.Settings.Default.TrayOffset;
+        public static Font trayFont = Properties.Settings.Default.TrayFont;
+        public static IconGenerator icon = new IconGenerator();
 
         public static int devLength = 0;
         public static string devID = "";
@@ -36,6 +39,7 @@ namespace WTFIsTheBatteryAt
         public static BatteryState devBatteryState = 0;
 
         public static bool warned = false;
+        public static bool valuesLoaded = false;
         public static bool closing = false;
 
         public Form1()
@@ -79,9 +83,16 @@ namespace WTFIsTheBatteryAt
         private void Form1_Load(object sender, EventArgs e)
         {
             Text = $"WTFIsTheBatteryAt {Program.version}";
+            icon.Generate("n/a", Properties.Settings.Default.TrayFont, Properties.Settings.Default.TrayColour, Properties.Settings.Default.TrayOffset, notifyIcon1);
+            //Icon x = icon.Generate("n/a", Properties.Settings.Default.TrayFont, Properties.Settings.Default.TrayColour, Properties.Settings.Default.TrayOffset);
+            //notifyIcon1.Icon = x;
+            Log($"Form1_Load(): Loading settings into window..");
 
+
+            Log($"Form1_Load(): dualsenseColor: {dualsenseColor.Name}");
             pictureBox1.BackColor = dualsenseColor;
             checkBox1.BackColor = dualsenseColor;
+            Log($"Form1_Load(): ShouldSetLight: {Properties.Settings.Default.ShouldSetLight}");
             checkBox1.Checked = Properties.Settings.Default.ShouldSetLight;
 
             label2.BackColor = dualsenseColor;
@@ -89,21 +100,46 @@ namespace WTFIsTheBatteryAt
 
             colorDialog1.Color = dualsenseColor;
 
+            Log($"Form1_Load(): trayColor: {trayColor.Name}");
+            label5.ForeColor = IdealTextColor(trayColor);
+            label5.BackColor = trayColor;
+            pictureBox2.BackColor = trayColor;
+            colorDialog2.Color = trayColor;
+
             label1.Text = "";
 
+            Log($"Form1_Load(): trayFont: {trayFont.Name}, {trayFont.Size}");
+            fontDialog1.Font = trayFont;
+            button2.Text = $"{trayFont.Name}, {trayFont.Size}";
+
+            Log($"Form1_Load(): trayOffset: x: {trayOffset.X}, y: {trayOffset.Y}");
+            numericUpDown5.Value = trayOffset.X;
+            numericUpDown6.Value = trayOffset.Y;
+
+            Log($"Form1_Load(): warningThreshold: {warningThreshold}");
             numericUpDown2.Value = warningThreshold;
 
+            Log($"Form1_Load(): tickRate: {tickRate}");
             numericUpDown3.Value = tickRate;
             updateTimer.Interval = tickRate;
 #if DEBUG
             tabControl1.Dock = DockStyle.None;
             textBox1.Visible = true;
+            checkBox2.Visible = true;
+            checkBox2.Enabled = true;
+            numericUpDown4.Enabled = true;
+            numericUpDown4.Visible = true;
             debugTimer.Enabled = true;
 #else
             tabControl1.Dock = DockStyle.Fill;
             textBox1.Visible = false;
+            checkBox2.Visible = false;
+            checkBox2.Enabled = false;
+            numericUpDown4.Enabled = false;
+            numericUpDown4.Visible = false;
             debugTimer.Enabled = false;
 #endif
+            valuesLoaded = true;
         }
 
         public void Tick(bool warning = false)
@@ -149,7 +185,9 @@ namespace WTFIsTheBatteryAt
             }
 
             label1.Text = $"Battery: {devBatteryPercent}% [{_batStateTextFull}]";
+            notifyIcon1.Icon = null;
             notifyIcon1.Text = $"WTFITBA: {devBatteryPercent}% [{_batStateTextSmall}]";
+            icon.Generate(devBatteryPercent.ToString(), Properties.Settings.Default.TrayFont, Properties.Settings.Default.TrayColour, Properties.Settings.Default.TrayOffset, notifyIcon1);
 
             if (devBatteryPercent < warningThreshold && warned == false && warning == true)
             {
@@ -183,7 +221,7 @@ namespace WTFIsTheBatteryAt
                 {
                     devices.Add(dev);
                     Log($"DS_GetDev(): DualSense Edge detected (1356&3570)");
-                    
+
                     // DualSense Edge
                 }
             }
@@ -467,6 +505,7 @@ namespace WTFIsTheBatteryAt
                 label2.ForeColor = IdealTextColor(colorDialog1.Color);
 
                 dualsenseColor = colorDialog1.Color;
+                Log($"pictureBox1_Click(): Changed to {colorDialog1.Color}.");
 
                 Properties.Settings.Default.LightbarColour = colorDialog1.Color;
                 Properties.Settings.Default.Save();
@@ -505,9 +544,13 @@ namespace WTFIsTheBatteryAt
 
         private void numericUpDown2_ValueChanged(object sender, EventArgs e)
         {
+            if (!valuesLoaded) return;
             warningThreshold = (int)numericUpDown2.Value;
 
             Properties.Settings.Default.WarningThreshold = (int)numericUpDown2.Value;
+
+            Log($"numericUpDown2_ValueChanged(): Changed to {warningThreshold}.");
+
         }
 
         private void NumericUpDown3_Enter(object? sender, EventArgs e)
@@ -518,15 +561,16 @@ namespace WTFIsTheBatteryAt
         private void NumericUpDown3_Leave(object? sender, EventArgs e)
         {
             Properties.Settings.Default.Save();
-
             if (dualsenseStarted) updateTimer.Start();
         }
 
         private void numericUpDown3_ValueChanged(object sender, EventArgs e)
         {
+            if (!valuesLoaded) return;
             tickRate = (int)numericUpDown3.Value;
 
             updateTimer.Interval = tickRate;
+            Log($"numericUpDown3_ValueChanged(): Changed to {tickRate}.");
 
             Properties.Settings.Default.TickRate = (int)numericUpDown3.Value;
         }
@@ -542,10 +586,18 @@ namespace WTFIsTheBatteryAt
                 $"connectionTimer: {connectionTimer.Enabled}" +
                 $"{Environment.NewLine}" +
                 $"windowUpdateTimer: {windowUpdateTimer.Enabled}";
+
+            if (checkBox2.Checked)
+            {
+                icon.Generate(new Random().Next(100).ToString(), trayFont, trayColor, trayOffset, notifyIcon1);
+            }
         }
 
         private void checkBox1_CheckedChanged(object sender, EventArgs e)
         {
+            if (!valuesLoaded) return;
+            Log($"checkBox1_CheckedChanged(): Changed to {checkBox1.Checked}.");
+
             Properties.Settings.Default.ShouldSetLight = checkBox1.Checked;
             Properties.Settings.Default.Save();
 
@@ -637,6 +689,62 @@ namespace WTFIsTheBatteryAt
                 process.Start();
                 Environment.Exit(0);
             }
+        }
+
+        private void numericUpDown4_ValueChanged(object sender, EventArgs e)
+        {
+            if (!Program.debug) return;
+            icon.Generate(numericUpDown4.Value.ToString(), Properties.Settings.Default.TrayFont, Properties.Settings.Default.TrayColour, Properties.Settings.Default.TrayOffset, notifyIcon1);
+        }
+
+        private void button2_Click(object sender, EventArgs e)
+        {
+            if (fontDialog1.ShowDialog() == DialogResult.OK)
+            {
+                trayFont = fontDialog1.Font;
+                button2.Text = $"{trayFont.Name}, {trayFont.Size}";
+                Log($"button2_Click(): Changed to {trayFont.Name}, {trayFont.Size}.");
+                Properties.Settings.Default.TrayFont = fontDialog1.Font;
+                Properties.Settings.Default.Save();
+            }
+        }
+
+        private void pictureBox2_Click(object sender, EventArgs e)
+        {
+            if (colorDialog2.ShowDialog() == DialogResult.OK)
+            {
+                trayColor = colorDialog2.Color;
+                Log($"pictureBox2_Click(): Changed to {colorDialog2.Color.Name}.");
+                pictureBox2.BackColor = trayColor;
+                label5.BackColor = trayColor;
+                label5.ForeColor = IdealTextColor(trayColor);
+                Properties.Settings.Default.TrayColour = colorDialog2.Color;
+                Properties.Settings.Default.Save();
+            }
+        }
+        public void SaveAndSetOffset()
+        {
+            Log($"SaveAndSetOffset(): Changed to {numericUpDown5.Value}, {numericUpDown6.Value}.");
+            trayOffset = new Point((int)numericUpDown5.Value, (int)numericUpDown6.Value);
+            Properties.Settings.Default.TrayOffset = new Point((int)numericUpDown5.Value, (int)numericUpDown6.Value);
+            Properties.Settings.Default.Save();
+        }
+
+        private void numericUpDown5_ValueChanged(object sender, EventArgs e)
+        {
+            if (!valuesLoaded) return;
+            SaveAndSetOffset();
+        }
+
+        private void numericUpDown6_ValueChanged(object sender, EventArgs e)
+        {
+            if (!valuesLoaded) return;
+            SaveAndSetOffset();
+        }
+
+        private void label5_Click(object sender, EventArgs e)
+        {
+            pictureBox2_Click(sender, e);
         }
     }
 }
