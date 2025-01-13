@@ -23,7 +23,7 @@ namespace WTFIsTheBatteryAt
         public static int warningThreshold = Properties.Settings.Default.WarningThreshold;
         public static int tickRate = Properties.Settings.Default.TickRate;
         public static Color trayColor = Properties.Settings.Default.TrayColour;
-        public static Point trayOffset = Properties.Settings.Default.TrayOffset;
+        public static Point trayOffset = Properties.Settings.Default.TrayOffset;    
         public static Font trayFont = Properties.Settings.Default.TrayFont;
         public static IconGenerator icon = new IconGenerator();
 
@@ -83,9 +83,9 @@ namespace WTFIsTheBatteryAt
         private void Form1_Load(object sender, EventArgs e)
         {
             Text = $"WTFIsTheBatteryAt {Program.version}";
+            Log($"Form1_Load(): Generating n/a icon..");
             icon.Generate("n/a", Properties.Settings.Default.TrayFont, Properties.Settings.Default.TrayColour, Properties.Settings.Default.TrayOffset, notifyIcon1);
-            //Icon x = icon.Generate("n/a", Properties.Settings.Default.TrayFont, Properties.Settings.Default.TrayColour, Properties.Settings.Default.TrayOffset);
-            //notifyIcon1.Icon = x;
+
             Log($"Form1_Load(): Loading settings into window..");
 
 
@@ -187,7 +187,7 @@ namespace WTFIsTheBatteryAt
             label1.Text = $"Battery: {devBatteryPercent}% [{_batStateTextFull}]";
             notifyIcon1.Icon = null;
             notifyIcon1.Text = $"WTFITBA: {devBatteryPercent}% [{_batStateTextSmall}]";
-            icon.Generate(devBatteryPercent.ToString(), Properties.Settings.Default.TrayFont, Properties.Settings.Default.TrayColour, Properties.Settings.Default.TrayOffset, notifyIcon1);
+            if(dualsenseStarted) icon.Generate(devBatteryPercent.ToString(), Properties.Settings.Default.TrayFont, Properties.Settings.Default.TrayColour, Properties.Settings.Default.TrayOffset, notifyIcon1);
 
             if (devBatteryPercent < warningThreshold && warned == false && warning == true)
             {
@@ -435,13 +435,14 @@ namespace WTFIsTheBatteryAt
         private void OnDisconnect()
         {
             Log("OnDisconnect(): Disconnected.");
-
             dualsenseStarted = false;
             warned = false;
             label1.Text = "";
             updateTimer.Stop();
             connectionTimer.Start();
+            notifyIcon1.Icon = null;
             notifyIcon1.Text = "WTFITBA: disconnected";
+            icon.Generate("n/a", Properties.Settings.Default.TrayFont, Properties.Settings.Default.TrayColour, Properties.Settings.Default.TrayOffset, notifyIcon1);
         }
 
         private void button1_Click(object sender, EventArgs e)
@@ -659,7 +660,10 @@ namespace WTFIsTheBatteryAt
                 label1.Text = "Waiting..";
                 label1.Location = new Point(3, 3);
 
+                notifyIcon1.Icon = null;
                 notifyIcon1.Text = "WTFITBA: disconnected";
+                icon.Generate("n/a", Properties.Settings.Default.TrayFont, Properties.Settings.Default.TrayColour, Properties.Settings.Default.TrayOffset, notifyIcon1);
+
                 numericUpDown1.Visible = false;
             }
         }
