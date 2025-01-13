@@ -9,8 +9,6 @@ namespace WTFIsTheBatteryAt
 {
     public class IconGenerator
     {
-
-
         [System.Runtime.InteropServices.DllImport("user32.dll", CharSet = CharSet.Auto)]
         extern static bool DestroyIcon(IntPtr handle);
 
@@ -30,6 +28,7 @@ namespace WTFIsTheBatteryAt
             tray.Icon = output;
 
             output.Dispose();
+            graphics.Dispose();
             // DISPOSE PROPERLY!!! PLEASE!!! WINDOWS HATES IT IF YOU HAVE TOO MANY GDI+ OBJECTS!!! AHHH!!!
         }
 
