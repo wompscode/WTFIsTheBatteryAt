@@ -6,11 +6,11 @@
     <Nullable>enable</Nullable>
     <UseWindowsForms>true</UseWindowsForms>
     <ImplicitUsings>enable</ImplicitUsings>
-    <ApplicationIcon>wtf.ico</ApplicationIcon>
+    <ApplicationIcon>wtf_invert.ico</ApplicationIcon>
   </PropertyGroup>
 
   <ItemGroup>
-    <Content Include="wtf.ico" />
+    <Content Include="wtf_invert.ico" />
   </ItemGroup>
 
   <ItemGroup>

@@ -125,10 +125,18 @@ namespace WTFIsTheBatteryAt
 #if DEBUG
             tabControl1.Dock = DockStyle.None;
             textBox1.Visible = true;
+            checkBox2.Visible = true;
+            checkBox2.Enabled = true;
+            numericUpDown4.Enabled = true;
+            numericUpDown4.Visible = true;
             debugTimer.Enabled = true;
 #else
             tabControl1.Dock = DockStyle.Fill;
             textBox1.Visible = false;
+            checkBox2.Visible = false;
+            checkBox2.Enabled = false;
+            numericUpDown4.Enabled = false;
+            numericUpDown4.Visible = false;
             debugTimer.Enabled = false;
 #endif
             valuesLoaded = true;
