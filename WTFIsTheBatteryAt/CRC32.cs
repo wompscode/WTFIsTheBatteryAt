@@ -48,7 +48,7 @@ namespace WTFIsTheBatteryAt
 
         private const uint HASH_SEED = 0xeada2d49;
 
-        public static uint ComputeCRC32(byte[] byteData, int size)
+        public static uint ComputeCRC32(byte[] byteData, uint size)
         {
             if (size < 0)
                 throw new ArgumentOutOfRangeException("In ComputeCRC32: the Size is negative.");
