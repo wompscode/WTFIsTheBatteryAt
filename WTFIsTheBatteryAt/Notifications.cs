@@ -4,6 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Forms;
+using static WTFIsTheBatteryAt.Logging;
 
 namespace WTFIsTheBatteryAt
 {
@@ -30,6 +31,8 @@ namespace WTFIsTheBatteryAt
             notify.BalloonTipText = text;
             notify.BalloonTipTitle = title;
             notify.ShowBalloonTip(0);
+
+            Log($"Notifications: ShowNotification(): sent notifications with title: {title}, text: {text}, iconType: {iconType}.");
         }
     }
 }

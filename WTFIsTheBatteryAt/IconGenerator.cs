@@ -4,6 +4,7 @@ using System.Linq;
 using System.Runtime.InteropServices;
 using System.Text;
 using System.Threading.Tasks;
+using static WTFIsTheBatteryAt.Logging;
 
 namespace WTFIsTheBatteryAt
 {
@@ -29,6 +30,7 @@ namespace WTFIsTheBatteryAt
 
             output.Dispose();
             graphics.Dispose();
+            Log($"IconGenerator: Generate(): tray icon generated with string: {value}, font: {font.Name}, {font.Size}, colour: {colour.Name}, offset: {offset.X}, {offset.Y}.");
             // DISPOSE PROPERLY!!! PLEASE!!! WINDOWS HATES IT IF YOU HAVE TOO MANY GDI+ OBJECTS!!! AHHH!!!
         }
 

@@ -26,6 +26,7 @@ namespace WTFIsTheBatteryAt
         public static Point trayOffset = Properties.Settings.Default.TrayOffset;    
         public static Font trayFont = Properties.Settings.Default.TrayFont;
         public static IconGenerator icon = new IconGenerator();
+        public static int lastBatteryPercent = 0;
 
         public static int devLength = 0;
         public static string devID = "";
@@ -59,7 +60,7 @@ namespace WTFIsTheBatteryAt
         {
             if (WindowState == FormWindowState.Minimized)
             {
-                Log("Form1_Resize(): Hiding window.");
+                Log("Form1_Resize(): Hiding window.", "[info]");
 
                 Hide();
             }
@@ -67,11 +68,11 @@ namespace WTFIsTheBatteryAt
 
         private void Form1_FormClosing(object? sender, FormClosingEventArgs e)
         {
-            Log($"Form1_FormClosing(): Exiting.");
+            Log($"Form1_FormClosing(): Exiting.", "[info]");
 
             if (dev != null)
             {
-                Log($"Form1_FormClosing(): Triggering dispose.");
+                Log($"Form1_FormClosing(): Triggering dispose.", "[info]");
 
                 DS_Dispose(devNum);
             };
@@ -83,16 +84,16 @@ namespace WTFIsTheBatteryAt
         private void Form1_Load(object sender, EventArgs e)
         {
             Text = $"WTFIsTheBatteryAt {Program.version}";
-            Log($"Form1_Load(): Generating n/a icon..");
+            Log($"Form1_Load(): Generating n/a icon..", "[init]");
             icon.Generate("n/a", Properties.Settings.Default.TrayFont, Properties.Settings.Default.TrayColour, Properties.Settings.Default.TrayOffset, notifyIcon1);
 
-            Log($"Form1_Load(): Loading settings into window..");
+            Log($"Form1_Load(): Loading settings into window..", "[init]");
 
 
-            Log($"Form1_Load(): dualsenseColor: {dualsenseColor.Name}");
+            Log($"Form1_Load(): dualsenseColor: {dualsenseColor.Name}", "[init]");
             pictureBox1.BackColor = dualsenseColor;
             checkBox1.BackColor = dualsenseColor;
-            Log($"Form1_Load(): ShouldSetLight: {Properties.Settings.Default.ShouldSetLight}");
+            Log($"Form1_Load(): ShouldSetLight: {Properties.Settings.Default.ShouldSetLight}", "[init]");
             checkBox1.Checked = Properties.Settings.Default.ShouldSetLight;
 
             label2.BackColor = dualsenseColor;
@@ -100,7 +101,7 @@ namespace WTFIsTheBatteryAt
 
             colorDialog1.Color = dualsenseColor;
 
-            Log($"Form1_Load(): trayColor: {trayColor.Name}");
+            Log($"Form1_Load(): trayColor: {trayColor.Name}", "[init]");
             label5.ForeColor = IdealTextColor(trayColor);
             label5.BackColor = trayColor;
             pictureBox2.BackColor = trayColor;
@@ -108,18 +109,18 @@ namespace WTFIsTheBatteryAt
 
             label1.Text = "";
 
-            Log($"Form1_Load(): trayFont: {trayFont.Name}, {trayFont.Size}");
+            Log($"Form1_Load(): trayFont: {trayFont.Name}, {trayFont.Size}", "[init]");
             fontDialog1.Font = trayFont;
             button2.Text = $"{trayFont.Name}, {trayFont.Size}";
 
-            Log($"Form1_Load(): trayOffset: x: {trayOffset.X}, y: {trayOffset.Y}");
+            Log($"Form1_Load(): trayOffset: x: {trayOffset.X}, y: {trayOffset.Y}", "[init]");
             numericUpDown5.Value = trayOffset.X;
             numericUpDown6.Value = trayOffset.Y;
 
-            Log($"Form1_Load(): warningThreshold: {warningThreshold}");
+            Log($"Form1_Load(): warningThreshold: {warningThreshold}", "[init]");
             numericUpDown2.Value = warningThreshold;
 
-            Log($"Form1_Load(): tickRate: {tickRate}");
+            Log($"Form1_Load(): tickRate: {tickRate}", "[init]");
             numericUpDown3.Value = tickRate;
             updateTimer.Interval = tickRate;
 #if DEBUG
@@ -184,10 +185,15 @@ namespace WTFIsTheBatteryAt
                     break;
             }
 
-            label1.Text = $"Battery: {devBatteryPercent}% [{_batStateTextFull}]";
-            notifyIcon1.Icon = null;
-            notifyIcon1.Text = $"WTFITBA: {devBatteryPercent}% [{_batStateTextSmall}]";
-            if(dualsenseStarted) icon.Generate(devBatteryPercent.ToString(), Properties.Settings.Default.TrayFont, Properties.Settings.Default.TrayColour, Properties.Settings.Default.TrayOffset, notifyIcon1);
+
+            if(lastBatteryPercent != devBatteryPercent)
+            {
+                label1.Text = $"Battery: {devBatteryPercent}% [{_batStateTextFull}]";
+                notifyIcon1.Icon = null;
+                notifyIcon1.Text = $"WTFITBA: {devBatteryPercent}% [{_batStateTextSmall}]";
+                if (dualsenseStarted) icon.Generate(devBatteryPercent.ToString(), Properties.Settings.Default.TrayFont, Properties.Settings.Default.TrayColour, Properties.Settings.Default.TrayOffset, notifyIcon1);
+                lastBatteryPercent = devBatteryPercent;
+            }
 
             if (devBatteryPercent < warningThreshold && warned == false && warning == true)
             {
@@ -435,11 +441,13 @@ namespace WTFIsTheBatteryAt
         private void OnDisconnect()
         {
             Log("OnDisconnect(): Disconnected.");
+            if (!dualsenseStarted) return;
             dualsenseStarted = false;
             warned = false;
             label1.Text = "";
             updateTimer.Stop();
             connectionTimer.Start();
+            lastBatteryPercent = 0;
             notifyIcon1.Icon = null;
             notifyIcon1.Text = "WTFITBA: disconnected";
             icon.Generate("n/a", Properties.Settings.Default.TrayFont, Properties.Settings.Default.TrayColour, Properties.Settings.Default.TrayOffset, notifyIcon1);
@@ -463,7 +471,7 @@ namespace WTFIsTheBatteryAt
 
                         Tick();
 
-                        Log("[info: DS_WriteData() is called twice to send the init packet, so all functionality works]");
+                        Log("DS_WriteData() is called twice to send the init packet, so all functionality works.", "[info]");
 
                         if (devBTInit == false) DS_WriteData(Color.Blue); // Incase it's not been initialized.
                         DS_WriteData(dualsenseColor);
@@ -506,7 +514,7 @@ namespace WTFIsTheBatteryAt
                 label2.ForeColor = IdealTextColor(colorDialog1.Color);
 
                 dualsenseColor = colorDialog1.Color;
-                Log($"pictureBox1_Click(): Changed to {colorDialog1.Color}.");
+                Log($"pictureBox1_Click(): Changed to {colorDialog1.Color}.", "[config]");
 
                 Properties.Settings.Default.LightbarColour = colorDialog1.Color;
                 Properties.Settings.Default.Save();
@@ -525,7 +533,7 @@ namespace WTFIsTheBatteryAt
 
         private void notifyIcon1_MouseDoubleClick(object sender, MouseEventArgs e)
         {
-            Log("notifyIcon1_MouseDoubleClick(): Showing window.");
+            Log("notifyIcon1_MouseDoubleClick(): Showing window.", "[info]");
 
             Show();
             WindowState = FormWindowState.Normal;
@@ -550,7 +558,7 @@ namespace WTFIsTheBatteryAt
 
             Properties.Settings.Default.WarningThreshold = (int)numericUpDown2.Value;
 
-            Log($"numericUpDown2_ValueChanged(): Changed to {warningThreshold}.");
+            Log($"numericUpDown2_ValueChanged(): Changed to {warningThreshold}.", "[config]");
 
         }
 
@@ -571,10 +579,12 @@ namespace WTFIsTheBatteryAt
             tickRate = (int)numericUpDown3.Value;
 
             updateTimer.Interval = tickRate;
-            Log($"numericUpDown3_ValueChanged(): Changed to {tickRate}.");
+            Log($"numericUpDown3_ValueChanged(): Changed to {tickRate}.", "[config]");
 
             Properties.Settings.Default.TickRate = (int)numericUpDown3.Value;
         }
+
+        public Random debugRandom = new Random();
 
         private void debugTimer_Tick(object sender, EventArgs e)
         {
@@ -590,14 +600,16 @@ namespace WTFIsTheBatteryAt
 
             if (checkBox2.Checked)
             {
-                icon.Generate(new Random().Next(100).ToString(), trayFont, trayColor, trayOffset, notifyIcon1);
+                int x = debugRandom.Next(100);
+                icon.Generate(x.ToString(), trayFont, trayColor, trayOffset, notifyIcon1);
+                lastBatteryPercent = x;
             }
         }
 
         private void checkBox1_CheckedChanged(object sender, EventArgs e)
         {
             if (!valuesLoaded) return;
-            Log($"checkBox1_CheckedChanged(): Changed to {checkBox1.Checked}.");
+            Log($"checkBox1_CheckedChanged(): Changed to {checkBox1.Checked}.", "[config]");
 
             Properties.Settings.Default.ShouldSetLight = checkBox1.Checked;
             Properties.Settings.Default.Save();
@@ -622,7 +634,7 @@ namespace WTFIsTheBatteryAt
 
                     Tick();
 
-                    Log("[info: DS_WriteData() is called twice to send the init packet, so all functionality works]");
+                    Log("DS_WriteData() is called twice to send the init packet, so all functionality works", "[info]");
                     if (devBTInit == false) DS_WriteData(Color.Blue); // In case it's not been initialized.
                     DS_WriteData(dualsenseColor);
 
@@ -643,19 +655,22 @@ namespace WTFIsTheBatteryAt
                 }
             }
         }
-
+        public static int windowState = 0; // 0 = none, 1 = waiting, 2 = reconnect
         private void windowUpdateTimer_Tick(object sender, EventArgs e)
         {
             if (dualsenseStarted)
             {
+                if (windowState == 2) return;
                 button1.Text = "Reconnect";
                 button1.Visible = true;
                 label1.Location = new Point(3, 32);
 
                 numericUpDown1.Visible = true;
+                windowState = 2;
             }
             else
             {
+                if (windowState == 1) return;
                 button1.Visible = false;
                 label1.Text = "Waiting..";
                 label1.Location = new Point(3, 3);
@@ -665,6 +680,7 @@ namespace WTFIsTheBatteryAt
                 icon.Generate("n/a", Properties.Settings.Default.TrayFont, Properties.Settings.Default.TrayColour, Properties.Settings.Default.TrayOffset, notifyIcon1);
 
                 numericUpDown1.Visible = false;
+                windowState = 1;
             }
         }
 
@@ -699,6 +715,7 @@ namespace WTFIsTheBatteryAt
         {
             if (!Program.debug) return;
             icon.Generate(numericUpDown4.Value.ToString(), Properties.Settings.Default.TrayFont, Properties.Settings.Default.TrayColour, Properties.Settings.Default.TrayOffset, notifyIcon1);
+            lastBatteryPercent = (int)numericUpDown4.Value;
         }
 
         private void button2_Click(object sender, EventArgs e)
@@ -707,7 +724,7 @@ namespace WTFIsTheBatteryAt
             {
                 trayFont = fontDialog1.Font;
                 button2.Text = $"{trayFont.Name}, {trayFont.Size}";
-                Log($"button2_Click(): Changed to {trayFont.Name}, {trayFont.Size}.");
+                Log($"button2_Click(): Changed to {trayFont.Name}, {trayFont.Size}.", "[config]");
                 Properties.Settings.Default.TrayFont = fontDialog1.Font;
                 Properties.Settings.Default.Save();
             }
@@ -718,7 +735,7 @@ namespace WTFIsTheBatteryAt
             if (colorDialog2.ShowDialog() == DialogResult.OK)
             {
                 trayColor = colorDialog2.Color;
-                Log($"pictureBox2_Click(): Changed to {colorDialog2.Color.Name}.");
+                Log($"pictureBox2_Click(): Changed to {colorDialog2.Color.Name}.", "[config]");
                 pictureBox2.BackColor = trayColor;
                 label5.BackColor = trayColor;
                 label5.ForeColor = IdealTextColor(trayColor);
@@ -728,7 +745,7 @@ namespace WTFIsTheBatteryAt
         }
         public void SaveAndSetOffset()
         {
-            Log($"SaveAndSetOffset(): Changed to {numericUpDown5.Value}, {numericUpDown6.Value}.");
+            Log($"SaveAndSetOffset(): Changed to {numericUpDown5.Value}, {numericUpDown6.Value}.", "[config]");
             trayOffset = new Point((int)numericUpDown5.Value, (int)numericUpDown6.Value);
             Properties.Settings.Default.TrayOffset = new Point((int)numericUpDown5.Value, (int)numericUpDown6.Value);
             Properties.Settings.Default.Save();

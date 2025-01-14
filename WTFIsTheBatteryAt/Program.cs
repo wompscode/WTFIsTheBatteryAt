@@ -10,7 +10,7 @@ namespace WTFIsTheBatteryAt
         [return: MarshalAs(UnmanagedType.Bool)]
         static extern bool AllocConsole();
 
-        public static string version = "1.0.6";
+        public static string version = "1.1.0";
 
         public static bool debug = false;
 
@@ -31,7 +31,7 @@ namespace WTFIsTheBatteryAt
 
             if (debug) AllocConsole();
 
-            Console.WriteLine($"WTFIsTheBatteryAt {version} - debug");
+            Console.WriteLine($"WTFIsTheBatteryAt {version} [debug]");
 
             ApplicationConfiguration.Initialize();
             Application.Run(new Form1());
