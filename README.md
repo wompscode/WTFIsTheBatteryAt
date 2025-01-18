@@ -1,7 +1,7 @@
 # ![logo](logo_128.png) WTFIsTheBatteryAt 
 I didn't like PlayStation Accessories, and wanted a better way to see my battery usage. Now we're here.  
 Pre-compiled releases available [here](https://github.com/wompscode/WTFIsTheBatteryAt/releases).  
-There is no auto-updater (although I may implement some degree of an update checker at least - only upon application start), so I would recommend checking back periodically.
+WTFIsTheBatteryAt checks for an update on startup, and will prompt you if you'd like to come back and grab a new version. (implemented in release 1.1.1)  
 
 # Dependencies
 Visual Studio Community 2022 was used in the creation of this application. Usage of a newer/older version may yield inconsistencies.  

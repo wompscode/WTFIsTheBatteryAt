@@ -1,12 +1,18 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
-    <OutputType>WinExe</OutputType>
-    <TargetFramework>net8.0-windows10.0.22621.0</TargetFramework>
-    <Nullable>enable</Nullable>
-    <UseWindowsForms>true</UseWindowsForms>
-    <ImplicitUsings>enable</ImplicitUsings>
-    <ApplicationIcon>wtf_invert.ico</ApplicationIcon>
+        <OutputType>WinExe</OutputType>
+        <TargetFramework>net8.0-windows10.0.22621.0</TargetFramework>
+        <Nullable>enable</Nullable>
+        <Authors>wompscode</Authors>
+        <UseWindowsForms>true</UseWindowsForms>
+        <ImplicitUsings>enable</ImplicitUsings>
+        <ApplicationIcon>wtf_invert.ico</ApplicationIcon>
+	    <AssemblyVersion>1.1.1</AssemblyVersion>
+	    <Version>1.1.1</Version>
+	    <IncludeSourceRevisionInInformationalVersion>false</IncludeSourceRevisionInInformationalVersion>
+	    <ProductName>WTFIsTheBatteryAt</ProductName>
+	    <AssemblyTitle>I didn't like PlayStation Accessories, and wanted a better way to see my battery usage. Now we're here.</AssemblyTitle>
   </PropertyGroup>
 
   <ItemGroup>
