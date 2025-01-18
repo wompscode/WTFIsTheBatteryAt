@@ -10,7 +10,7 @@ namespace WTFIsTheBatteryAt
 {
     public class IconGenerator
     {
-        [System.Runtime.InteropServices.DllImport("user32.dll", CharSet = CharSet.Auto)]
+        [DllImport("user32.dll", CharSet = CharSet.Auto)]
         extern static bool DestroyIcon(IntPtr handle);
 
         public void Generate(string value, Font font, Color colour, Point offset, NotifyIcon tray)
@@ -20,7 +20,7 @@ namespace WTFIsTheBatteryAt
             graphics.DrawString(value, font, new SolidBrush(colour), offset.X, offset.Y);
 
             IntPtr _handle = bmp.GetHicon();
-            Icon output;
+            Icon? output;
 
             Icon _temp = Icon.FromHandle(_handle);
             output = _temp.Clone() as Icon;
@@ -28,7 +28,7 @@ namespace WTFIsTheBatteryAt
 
             tray.Icon = output;
 
-            output.Dispose();
+            if(output != null) output.Dispose();
             graphics.Dispose();
             Log($"IconGenerator: Generate(): tray icon generated with string: {value}, font: {font.Name}, {font.Size}, colour: {colour.Name}, offset: {offset.X}, {offset.Y}.");
             // DISPOSE PROPERLY!!! PLEASE!!! WINDOWS HATES IT IF YOU HAVE TOO MANY GDI+ OBJECTS!!! AHHH!!!

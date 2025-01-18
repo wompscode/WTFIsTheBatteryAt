@@ -196,6 +196,7 @@
             // 
             // groupBox1
             // 
+            groupBox1.Anchor = AnchorStyles.Top | AnchorStyles.Right;
             groupBox1.Controls.Add(label8);
             groupBox1.Controls.Add(label5);
             groupBox1.Controls.Add(label7);

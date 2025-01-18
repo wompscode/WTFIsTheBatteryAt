@@ -624,7 +624,6 @@ namespace WTFIsTheBatteryAt
                 {
                     Log("connectionTimer_Tick(): Attempting to connect controller.");
 
-
                     DS_GetDev(controllerPlayer);
                     if (dev == null) return;
 
@@ -762,7 +761,6 @@ namespace WTFIsTheBatteryAt
             if (!valuesLoaded) return;
             SaveAndSetOffset();
         }
-
         private void label5_Click(object sender, EventArgs e)
         {
             pictureBox2_Click(sender, e);
