@@ -30,9 +30,9 @@
         {
             components = new System.ComponentModel.Container();
             System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(Form1));
-            TreeNode treeNode1 = new TreeNode("Percentage: 50");
-            TreeNode treeNode2 = new TreeNode("Connected");
-            TreeNode treeNode3 = new TreeNode("PluginName", new TreeNode[] { treeNode1, treeNode2 });
+            TreeNode treeNode4 = new TreeNode("Percentage: 50");
+            TreeNode treeNode5 = new TreeNode("Connected");
+            TreeNode treeNode6 = new TreeNode("PluginName", new TreeNode[] { treeNode4, treeNode5 });
             numericUpDown1 = new NumericUpDown();
             button1 = new Button();
             label1 = new Label();
@@ -71,6 +71,7 @@
             fontDialog1 = new FontDialog();
             colorDialog2 = new ColorDialog();
             checkBox2 = new CheckBox();
+            button5 = new Button();
             ((System.ComponentModel.ISupportInitialize)numericUpDown1).BeginInit();
             ((System.ComponentModel.ISupportInitialize)pictureBox1).BeginInit();
             tabControl1.SuspendLayout();
@@ -347,6 +348,7 @@
             // 
             // tabPage3
             // 
+            tabPage3.Controls.Add(button5);
             tabPage3.Controls.Add(button4);
             tabPage3.Controls.Add(button3);
             tabPage3.Controls.Add(treeView1);
@@ -382,13 +384,13 @@
             // 
             treeView1.Location = new Point(6, 3);
             treeView1.Name = "treeView1";
-            treeNode1.Name = "Node1";
-            treeNode1.Text = "Percentage: 50";
-            treeNode2.Name = "Node2";
-            treeNode2.Text = "Connected";
-            treeNode3.Name = "Node0";
-            treeNode3.Text = "PluginName";
-            treeView1.Nodes.AddRange(new TreeNode[] { treeNode3 });
+            treeNode4.Name = "Node1";
+            treeNode4.Text = "Percentage: 50";
+            treeNode5.Name = "Node2";
+            treeNode5.Text = "Connected";
+            treeNode6.Name = "Node0";
+            treeNode6.Text = "PluginName";
+            treeView1.Nodes.AddRange(new TreeNode[] { treeNode6 });
             treeView1.Size = new Size(181, 176);
             treeView1.TabIndex = 0;
             // 
@@ -433,6 +435,16 @@
             checkBox2.Size = new Size(15, 14);
             checkBox2.TabIndex = 20;
             checkBox2.UseVisualStyleBackColor = true;
+            // 
+            // button5
+            // 
+            button5.Location = new Point(193, 147);
+            button5.Name = "button5";
+            button5.Size = new Size(129, 32);
+            button5.TabIndex = 3;
+            button5.Text = "Open Plugin UI";
+            button5.UseVisualStyleBackColor = true;
+            button5.Click += button5_Click;
             // 
             // Form1
             // 
@@ -509,5 +521,6 @@
         private TreeView treeView1;
         private Button button4;
         private Button button3;
+        private Button button5;
     }
 }

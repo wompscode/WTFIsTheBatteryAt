@@ -1,9 +1,10 @@
 ﻿using WTFIsTheBatteryAt.Plugins;
-
+using System.Windows.Forms;
 namespace WTFIsTheBatteryAt.TestPlugin
 {
     public class Class1 : IPlugin
     {
+        Settings? settings = null;
         public PluginInformation.Information Information => new PluginInformation.Information
         {
             Name = "TestPlugin",
@@ -16,15 +17,25 @@ namespace WTFIsTheBatteryAt.TestPlugin
                 Mac = false
             }
         };
-
+        public void AnotherFunction()
+        {
+            Console.WriteLine("What happens?");
+        }
         public void Dispose()
         {
             Console.WriteLine("Goodbye from TestPlugin.");
+
+            if(settings != null)
+            {
+                settings.Hide();
+                settings.Dispose();
+            }
         }
 
         public void Init()
         {
             Console.WriteLine("Hello from TestPlugin.");
+            AnotherFunction();
         }
         Random x = new Random();
 
@@ -64,5 +75,10 @@ namespace WTFIsTheBatteryAt.TestPlugin
             DataChanged?.Invoke(this, batteries);
         }
 
+        public void OpenUI()
+        {
+            if(settings == null || settings.IsDisposed) settings = new Settings();
+            if (settings.Visible) settings.Hide(); else settings.Show();
+        }
     }
 }

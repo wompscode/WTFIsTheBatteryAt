@@ -144,7 +144,7 @@ namespace WTFIsTheBatteryAt
 
             Log("Form1_Load(): connecting to plugin events", "[init]");
 
-            foreach (IPlugin plugin in PluginLoader.loaded)
+            foreach (IPlugin plugin in PluginLoader.Loaded)
             {
                 plugin.DataChanged += Plugin_DataChanged;
                 plugin.ConnectionStateChanged += Plugin_ConnectionStateChanged;
@@ -191,7 +191,7 @@ namespace WTFIsTheBatteryAt
             KeyValuePair<string, TreeNodes> node = nodes.First(x => x.Key == ((IPlugin)sender).Information.Name);
             TreeNodes _nodes = node.Value;
             _nodes.battery.Nodes.Clear();
-            foreach(Structs.DeviceBattery battery in data)
+            foreach (Structs.DeviceBattery battery in data)
             {
                 Log($"{battery.Device}: {battery.Percentage}", $"[{((IPlugin)sender).Information.Name}]");
                 TreeNode bat = new TreeNode($"{battery.Device}: {battery.Percentage}");
@@ -202,7 +202,7 @@ namespace WTFIsTheBatteryAt
         public void Tick(bool warning = false)
         {
             Log("Tick(): Reached.");
-            foreach (IPlugin plugin in PluginLoader.loaded)
+            foreach (IPlugin plugin in PluginLoader.Loaded)
             {
                 plugin.Heartbeat();
             }
@@ -829,8 +829,8 @@ namespace WTFIsTheBatteryAt
         {
             string current = treeView1.SelectedNode.Text;
             if (string.IsNullOrEmpty(current)) return;
-            
-            IPlugin? plugin = PluginLoader.loaded.FirstOrDefault(x => x.Information.Name == current);
+
+            IPlugin? plugin = PluginLoader.Loaded.FirstOrDefault(x => x.Information.Name == current);
 
             if (plugin != null)
             {
@@ -838,7 +838,7 @@ namespace WTFIsTheBatteryAt
                 plugin.DataChanged -= Plugin_DataChanged;
 
                 plugin.Dispose();
-                PluginLoader.loaded.Remove(plugin);
+                PluginLoader.Loaded.Remove(plugin);
                 KeyValuePair<string, TreeNodes> node = nodes.First(x => x.Key == plugin.Information.Name);
                 node.Value.battery.Remove();
                 node.Value.connected.Remove();
@@ -849,14 +849,13 @@ namespace WTFIsTheBatteryAt
 
         private void button3_Click(object sender, EventArgs e)
         {
-            IPlugin[] loaded = PluginLoader.loaded.ToArray();
+            IPlugin[] loaded = PluginLoader.Loaded.ToArray();
             foreach (IPlugin plugin in loaded)
             {
                 plugin.ConnectionStateChanged -= Plugin_ConnectionStateChanged;
                 plugin.DataChanged -= Plugin_DataChanged;
 
-                plugin.Dispose();
-                PluginLoader.loaded.Remove(plugin);
+                PluginLoader.UnloadPlugin(plugin);
                 KeyValuePair<string, TreeNodes> node = nodes.FirstOrDefault(x => x.Key == plugin.Information.Name);
                 node.Value.battery.Remove();
                 node.Value.connected.Remove();
@@ -866,7 +865,7 @@ namespace WTFIsTheBatteryAt
 
             PluginLoader.LoadPlugins();
 
-            foreach (IPlugin plugin in PluginLoader.loaded)
+            foreach (IPlugin plugin in PluginLoader.Loaded)
             {
                 plugin.DataChanged += Plugin_DataChanged;
                 plugin.ConnectionStateChanged += Plugin_ConnectionStateChanged;
@@ -886,6 +885,19 @@ namespace WTFIsTheBatteryAt
                         connected = connected
                     }
                     ));
+            }
+        }
+
+        private void button5_Click(object sender, EventArgs e)
+        {
+            string current = treeView1.SelectedNode.Text;
+            if (string.IsNullOrEmpty(current)) return;
+
+            IPlugin? plugin = PluginLoader.Loaded.FirstOrDefault(x => x.Information.Name == current);
+
+            if (plugin != null)
+            {
+                plugin.OpenUI();
             }
         }
     }

@@ -27,5 +27,7 @@
         public void Dispose();
 
         public void Heartbeat();
+
+        public void OpenUI();
     }
 }
