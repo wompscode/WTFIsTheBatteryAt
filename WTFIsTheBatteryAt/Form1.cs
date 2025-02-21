@@ -5,6 +5,7 @@ namespace WTFIsTheBatteryAt
     using static Logging;
     using static Notifications;
     using static ColourFunctions;
+    using Plugins;
 
     // WTFIsTheBatteryAt
     //  Because I didn't want to use PlayStation Accessories anymore.
@@ -23,7 +24,7 @@ namespace WTFIsTheBatteryAt
         public static int warningThreshold = Properties.Settings.Default.WarningThreshold;
         public static int tickRate = Properties.Settings.Default.TickRate;
         public static Color trayColor = Properties.Settings.Default.TrayColour;
-        public static Point trayOffset = Properties.Settings.Default.TrayOffset;    
+        public static Point trayOffset = Properties.Settings.Default.TrayOffset;
         public static Font trayFont = Properties.Settings.Default.TrayFont;
         public static IconGenerator icon = new IconGenerator();
         public static int lastBatteryPercent = 0;
@@ -140,13 +141,71 @@ namespace WTFIsTheBatteryAt
             numericUpDown4.Visible = false;
             debugTimer.Enabled = false;
 #endif
+
+            Log("Form1_Load(): connecting to plugin events", "[init]");
+
+            foreach (IPlugin plugin in PluginLoader.loaded)
+            {
+                plugin.DataChanged += Plugin_DataChanged;
+                plugin.ConnectionStateChanged += Plugin_ConnectionStateChanged;
+                TreeNode x = new TreeNode($"{plugin.Information.Name}");
+                TreeNode battery = new TreeNode($"Devices");
+                TreeNode connected = new TreeNode($"Connected");
+                x.Nodes.Add(battery);
+                x.Nodes.Add(connected);
+                treeView1.Nodes.Add(x);
+
+                nodes.Add(new KeyValuePair<string, TreeNodes>(
+                    plugin.Information.Name,
+                    new TreeNodes
+                    {
+                        root = x,
+                        battery = battery,
+                        connected = connected
+                    }
+                    ));
+            }
+
             valuesLoaded = true;
+        }
+
+        struct TreeNodes
+        {
+            public TreeNode root;
+            public TreeNode battery;
+            public TreeNode connected;
+        }
+
+        List<KeyValuePair<string, TreeNodes>> nodes = new List<KeyValuePair<string, TreeNodes>>();
+
+        private void Plugin_ConnectionStateChanged(object sender, ConnectionStateChangedEventArgs e)
+        {
+            Log($"{e.Connected}", $"[{((IPlugin)sender).Information.Name}]");
+            KeyValuePair<string, TreeNodes> node = nodes.First(x => x.Key == ((IPlugin)sender).Information.Name);
+            TreeNodes _nodes = node.Value;
+            _nodes.connected.Text = $"{(e.Connected ? "Connected" : "Disconnected")}";
+        }
+
+        private void Plugin_DataChanged(object sender, Structs.DeviceBattery[] data)
+        {
+            KeyValuePair<string, TreeNodes> node = nodes.First(x => x.Key == ((IPlugin)sender).Information.Name);
+            TreeNodes _nodes = node.Value;
+            _nodes.battery.Nodes.Clear();
+            foreach(Structs.DeviceBattery battery in data)
+            {
+                Log($"{battery.Device}: {battery.Percentage}", $"[{((IPlugin)sender).Information.Name}]");
+                TreeNode bat = new TreeNode($"{battery.Device}: {battery.Percentage}");
+                _nodes.battery.Nodes.Add(bat);
+            }
         }
 
         public void Tick(bool warning = false)
         {
             Log("Tick(): Reached.");
-
+            foreach (IPlugin plugin in PluginLoader.loaded)
+            {
+                plugin.Heartbeat();
+            }
             if (dev == null) return;
             else
             {
@@ -186,7 +245,7 @@ namespace WTFIsTheBatteryAt
             }
 
 
-            if(lastBatteryPercent != devBatteryPercent)
+            if (lastBatteryPercent != devBatteryPercent)
             {
                 label1.Text = $"Battery: {devBatteryPercent}% [{_batStateTextFull}]";
                 notifyIcon1.Icon = null;
@@ -764,6 +823,70 @@ namespace WTFIsTheBatteryAt
         private void label5_Click(object sender, EventArgs e)
         {
             pictureBox2_Click(sender, e);
+        }
+
+        private void button4_Click(object sender, EventArgs e)
+        {
+            string current = treeView1.SelectedNode.Text;
+            if (string.IsNullOrEmpty(current)) return;
+            
+            IPlugin? plugin = PluginLoader.loaded.FirstOrDefault(x => x.Information.Name == current);
+
+            if (plugin != null)
+            {
+                plugin.ConnectionStateChanged -= Plugin_ConnectionStateChanged;
+                plugin.DataChanged -= Plugin_DataChanged;
+
+                plugin.Dispose();
+                PluginLoader.loaded.Remove(plugin);
+                KeyValuePair<string, TreeNodes> node = nodes.First(x => x.Key == plugin.Information.Name);
+                node.Value.battery.Remove();
+                node.Value.connected.Remove();
+                node.Value.root.Remove();
+                nodes.Remove(node);
+            }
+        }
+
+        private void button3_Click(object sender, EventArgs e)
+        {
+            IPlugin[] loaded = PluginLoader.loaded.ToArray();
+            foreach (IPlugin plugin in loaded)
+            {
+                plugin.ConnectionStateChanged -= Plugin_ConnectionStateChanged;
+                plugin.DataChanged -= Plugin_DataChanged;
+
+                plugin.Dispose();
+                PluginLoader.loaded.Remove(plugin);
+                KeyValuePair<string, TreeNodes> node = nodes.FirstOrDefault(x => x.Key == plugin.Information.Name);
+                node.Value.battery.Remove();
+                node.Value.connected.Remove();
+                node.Value.root.Remove();
+                nodes.Remove(node);
+            }
+
+            PluginLoader.LoadPlugins();
+
+            foreach (IPlugin plugin in PluginLoader.loaded)
+            {
+                plugin.DataChanged += Plugin_DataChanged;
+                plugin.ConnectionStateChanged += Plugin_ConnectionStateChanged;
+                TreeNode x = new TreeNode($"{plugin.Information.Name}");
+                TreeNode battery = new TreeNode($"Devices");
+                TreeNode connected = new TreeNode($"Connected");
+                x.Nodes.Add(battery);
+                x.Nodes.Add(connected);
+                treeView1.Nodes.Add(x);
+
+                nodes.Add(new KeyValuePair<string, TreeNodes>(
+                    plugin.Information.Name,
+                    new TreeNodes
+                    {
+                        root = x,
+                        battery = battery,
+                        connected = connected
+                    }
+                    ));
+            }
         }
     }
 }

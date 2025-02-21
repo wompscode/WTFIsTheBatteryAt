@@ -9,7 +9,7 @@
         <ImplicitUsings>enable</ImplicitUsings>
         <ApplicationIcon>wtf_invert.ico</ApplicationIcon>
 	    <AssemblyVersion>1.1.1</AssemblyVersion>
-	    <Version>1.1.1</Version>
+	    <Version>1.1.2</Version>
 	    <IncludeSourceRevisionInInformationalVersion>false</IncludeSourceRevisionInInformationalVersion>
 	    <ProductName>WTFIsTheBatteryAt</ProductName>
 	    <AssemblyTitle>I didn't like PlayStation Accessories, and wanted a better way to see my battery usage. Now we're here.</AssemblyTitle>
@@ -37,5 +37,7 @@
       <LastGenOutput>Settings.Designer.cs</LastGenOutput>
     </None>
   </ItemGroup>
-
+	<ItemGroup>
+		<ProjectReference Include="..\WTFIsTheBatteryAt.Plugins\WTFIsTheBatteryAt.Plugins.csproj" />
+	</ItemGroup>
 </Project>

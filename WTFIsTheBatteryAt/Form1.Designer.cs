@@ -30,6 +30,9 @@
         {
             components = new System.ComponentModel.Container();
             System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(Form1));
+            TreeNode treeNode1 = new TreeNode("Percentage: 50");
+            TreeNode treeNode2 = new TreeNode("Connected");
+            TreeNode treeNode3 = new TreeNode("PluginName", new TreeNode[] { treeNode1, treeNode2 });
             numericUpDown1 = new NumericUpDown();
             button1 = new Button();
             label1 = new Label();
@@ -56,6 +59,10 @@
             numericUpDown3 = new NumericUpDown();
             label3 = new Label();
             numericUpDown2 = new NumericUpDown();
+            tabPage3 = new TabPage();
+            button4 = new Button();
+            button3 = new Button();
+            treeView1 = new TreeView();
             debugTimer = new System.Windows.Forms.Timer(components);
             connectionTimer = new System.Windows.Forms.Timer(components);
             windowUpdateTimer = new System.Windows.Forms.Timer(components);
@@ -75,6 +82,7 @@
             ((System.ComponentModel.ISupportInitialize)numericUpDown5).BeginInit();
             ((System.ComponentModel.ISupportInitialize)numericUpDown3).BeginInit();
             ((System.ComponentModel.ISupportInitialize)numericUpDown2).BeginInit();
+            tabPage3.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)numericUpDown4).BeginInit();
             SuspendLayout();
             // 
@@ -145,6 +153,7 @@
             // 
             tabControl1.Controls.Add(tabPage1);
             tabControl1.Controls.Add(tabPage2);
+            tabControl1.Controls.Add(tabPage3);
             tabControl1.Location = new Point(0, 0);
             tabControl1.Name = "tabControl1";
             tabControl1.SelectedIndex = 0;
@@ -336,6 +345,53 @@
             numericUpDown2.TabIndex = 5;
             numericUpDown2.ValueChanged += numericUpDown2_ValueChanged;
             // 
+            // tabPage3
+            // 
+            tabPage3.Controls.Add(button4);
+            tabPage3.Controls.Add(button3);
+            tabPage3.Controls.Add(treeView1);
+            tabPage3.Location = new Point(4, 24);
+            tabPage3.Name = "tabPage3";
+            tabPage3.Padding = new Padding(3);
+            tabPage3.Size = new Size(330, 182);
+            tabPage3.TabIndex = 2;
+            tabPage3.Text = "tabPage3";
+            tabPage3.UseVisualStyleBackColor = true;
+            // 
+            // button4
+            // 
+            button4.Location = new Point(193, 44);
+            button4.Name = "button4";
+            button4.Size = new Size(129, 32);
+            button4.TabIndex = 2;
+            button4.Text = "Unload selected";
+            button4.UseVisualStyleBackColor = true;
+            button4.Click += button4_Click;
+            // 
+            // button3
+            // 
+            button3.Location = new Point(193, 6);
+            button3.Name = "button3";
+            button3.Size = new Size(129, 32);
+            button3.TabIndex = 1;
+            button3.Text = "Reload All Plugins";
+            button3.UseVisualStyleBackColor = true;
+            button3.Click += button3_Click;
+            // 
+            // treeView1
+            // 
+            treeView1.Location = new Point(6, 3);
+            treeView1.Name = "treeView1";
+            treeNode1.Name = "Node1";
+            treeNode1.Text = "Percentage: 50";
+            treeNode2.Name = "Node2";
+            treeNode2.Text = "Connected";
+            treeNode3.Name = "Node0";
+            treeNode3.Text = "PluginName";
+            treeView1.Nodes.AddRange(new TreeNode[] { treeNode3 });
+            treeView1.Size = new Size(181, 176);
+            treeView1.TabIndex = 0;
+            // 
             // debugTimer
             // 
             debugTimer.Interval = 250;
@@ -407,6 +463,7 @@
             ((System.ComponentModel.ISupportInitialize)numericUpDown5).EndInit();
             ((System.ComponentModel.ISupportInitialize)numericUpDown3).EndInit();
             ((System.ComponentModel.ISupportInitialize)numericUpDown2).EndInit();
+            tabPage3.ResumeLayout(false);
             ((System.ComponentModel.ISupportInitialize)numericUpDown4).EndInit();
             ResumeLayout(false);
             PerformLayout();
@@ -448,5 +505,9 @@
         private GroupBox groupBox1;
         private Label label8;
         private CheckBox checkBox2;
+        private TabPage tabPage3;
+        private TreeView treeView1;
+        private Button button4;
+        private Button button3;
     }
 }

@@ -37,7 +37,7 @@ namespace WTFIsTheBatteryAt
             Log($"WTFIsTheBatteryAt {version}", "[init]");
             Log("Checking for update..", "[debug]");
 
-            UpdateChecker.UpdateStatus updateStatus = null;
+            UpdateChecker.UpdateStatus? updateStatus = null;
             Task<UpdateChecker.UpdateStatus> updateCheck = CheckForUpdateAsync(version);
             Task pauseCheck = updateCheck.ContinueWith(x => updateStatus = x.Result);
             pauseCheck.Wait();
@@ -66,6 +66,8 @@ namespace WTFIsTheBatteryAt
             {
                 Log("UpdateCheck failed, updateStatus is still null - shouldn't happen, ignoring anyway..", "[debug]");
             }
+
+            PluginLoader.LoadPlugins();
             ApplicationConfiguration.Initialize();
             Application.Run(new Form1());
         }
