@@ -7,8 +7,7 @@ using System.Threading.Tasks;
 namespace WTFIsTheBatteryAt
 {
     // https://github.com/WujekFoliarz/Wujek-Dualsense-API/blob/master/Wujek%20Dualsense%20API/CRC32.cs
-    
-    internal static class CRC32
+    public static class CRC32
     {
         private static readonly uint[] ChecksumTableCRC32 =
         {
@@ -47,7 +46,6 @@ namespace WTFIsTheBatteryAt
         };
 
         private const uint HASH_SEED = 0xeada2d49;
-
         public static uint ComputeCRC32(byte[] byteData, uint size)
         {
             if (size < 0)

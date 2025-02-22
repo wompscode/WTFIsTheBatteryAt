@@ -8,7 +8,7 @@ using static WTFIsTheBatteryAt.Logging;
 
 namespace WTFIsTheBatteryAt
 {
-    internal static class Notifications
+    public static class Notifications
     {
         public static void ShowNotification(NotifyIcon notify, string title, string text, int iconType = 0)
         {

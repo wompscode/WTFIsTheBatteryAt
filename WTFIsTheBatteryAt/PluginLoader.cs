@@ -26,13 +26,13 @@ namespace WTFIsTheBatteryAt
 
                 if(instance != null)
                 {
-                    if(Loaded.Count > 0 && Loaded.First(x=>x.Information.Name == instance.Information.Name) != null)
+                    if(Loaded.Count > 0 && Loaded.First(x=>x.Information.InternalName == instance.Information.InternalName) != null)
                     {
-                        Log($"Cannot load two plugins with the same name. {instance.Information.Name} already exists in loaded plugin list.", "[plugins]");
+                        Log($"Cannot load two plugins with the same name. {instance.Information.InternalName} already exists in loaded plugin list.", "[plugins]");
                         return;
                     }
                     instance.Init();
-                    Log($"{instance.Information.Name}:\nAuthor: {instance.Information.Author}\nDevice: {instance.Information.Device}\nOS Support: W: {instance.Information.OSSupport.Windows}, M: {instance.Information.OSSupport.Mac}, L: {instance.Information.OSSupport.Linux}", "[plugins]");
+                    Log($"{instance.Information.Name} ({instance.Information.InternalName}):\nAuthor: {instance.Information.Author}\nDevice: {instance.Information.Device}\nOS Support: W: {instance.Information.OSSupport.Windows}, M: {instance.Information.OSSupport.Mac}, L: {instance.Information.OSSupport.Linux}", "[plugins]");
                     Loaded.Add(instance);
                 }
             }

@@ -7,7 +7,7 @@
     <Nullable>enable</Nullable>
   </PropertyGroup>
 	<ItemGroup>
-		<ProjectReference Include="..\WTFIsTheBatteryAt.Plugins\WTFIsTheBatteryAt.Plugins.csproj" />
+		<ProjectReference Include="..\WTFIsTheBatteryAt\WTFIsTheBatteryAt.csproj" />
 	</ItemGroup>
 	<ItemGroup>
 	  <Compile Update="Properties\Settings.Designer.cs">

@@ -1,6 +1,6 @@
 ﻿namespace WTFIsTheBatteryAt
 {
-    internal static class ColourFunctions
+    public static class ColourFunctions
     {
         public static Color IdealTextColor(Color bg)
         {

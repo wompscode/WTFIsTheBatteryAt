@@ -8,7 +8,7 @@ using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Forms;
 
-namespace WTFIsTheBatteryAt.TestPlugin
+namespace WTFIsTheBatteryAt.DualSensePlugin
 {
     public partial class Settings : Form
     {

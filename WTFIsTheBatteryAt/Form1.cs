@@ -148,27 +148,33 @@ namespace WTFIsTheBatteryAt
             {
                 plugin.DataChanged += Plugin_DataChanged;
                 plugin.ConnectionStateChanged += Plugin_ConnectionStateChanged;
-                TreeNode x = new TreeNode($"{plugin.Information.Name}");
-                TreeNode battery = new TreeNode($"Devices");
-                TreeNode connected = new TreeNode($"Connected");
-                x.Nodes.Add(battery);
-                x.Nodes.Add(connected);
-                treeView1.Nodes.Add(x);
-
-                nodes.Add(new KeyValuePair<string, TreeNodes>(
-                    plugin.Information.Name,
-                    new TreeNodes
-                    {
-                        root = x,
-                        battery = battery,
-                        connected = connected
-                    }
-                    ));
+                PopulateTree(plugin);
             }
 
             valuesLoaded = true;
         }
+        public void PopulateTree(IPlugin plugin)
+        {
+            TreeNode x = new TreeNode($"{plugin.Information.Name}");
+            x.Name = $"{plugin.Information.InternalName} / Root";
+            TreeNode battery = new TreeNode($"Devices");
+            battery.Name = $"{plugin.Information.InternalName} / Devices";
+            TreeNode connected = new TreeNode($"Connected");
+            connected.Name = $"{plugin.Information.InternalName} / State";
+            x.Nodes.Add(battery);
+            x.Nodes.Add(connected);
+            treeView1.Nodes.Add(x);
 
+            nodes.Add(new KeyValuePair<string, TreeNodes>(
+                plugin.Information.Name,
+                new TreeNodes
+                {
+                    root = x,
+                    battery = battery,
+                    connected = connected
+                }
+                ));
+        }
         struct TreeNodes
         {
             public TreeNode root;
@@ -195,6 +201,7 @@ namespace WTFIsTheBatteryAt
             {
                 Log($"{battery.Device}: {battery.Percentage}", $"[{((IPlugin)sender).Information.Name}]");
                 TreeNode bat = new TreeNode($"{battery.Device}: {battery.Percentage}");
+                bat.Name = $"{((IPlugin)sender).Information.InternalName} / {battery.Device}";
                 _nodes.battery.Nodes.Add(bat);
             }
         }
@@ -206,6 +213,8 @@ namespace WTFIsTheBatteryAt
             {
                 plugin.Heartbeat();
             }
+
+            return;
             if (dev == null) return;
             else
             {
@@ -514,6 +523,7 @@ namespace WTFIsTheBatteryAt
 
         private void button1_Click(object sender, EventArgs e)
         {
+            return;
             if (dualsenseStarted)
             {
                 try
@@ -677,6 +687,7 @@ namespace WTFIsTheBatteryAt
 
         private void connectionTimer_Tick(object sender, EventArgs e)
         {
+            return;
             try
             {
                 if (!dualsenseStarted)
@@ -827,10 +838,10 @@ namespace WTFIsTheBatteryAt
 
         private void button4_Click(object sender, EventArgs e)
         {
-            string current = treeView1.SelectedNode.Text;
+            string current = treeView1.SelectedNode.Name.Split("/").First().Trim();
             if (string.IsNullOrEmpty(current)) return;
 
-            IPlugin? plugin = PluginLoader.Loaded.FirstOrDefault(x => x.Information.Name == current);
+            IPlugin? plugin = PluginLoader.Loaded.FirstOrDefault(x => x.Information.InternalName == current);
 
             if (plugin != null)
             {
@@ -869,36 +880,27 @@ namespace WTFIsTheBatteryAt
             {
                 plugin.DataChanged += Plugin_DataChanged;
                 plugin.ConnectionStateChanged += Plugin_ConnectionStateChanged;
-                TreeNode x = new TreeNode($"{plugin.Information.Name}");
-                TreeNode battery = new TreeNode($"Devices");
-                TreeNode connected = new TreeNode($"Connected");
-                x.Nodes.Add(battery);
-                x.Nodes.Add(connected);
-                treeView1.Nodes.Add(x);
-
-                nodes.Add(new KeyValuePair<string, TreeNodes>(
-                    plugin.Information.Name,
-                    new TreeNodes
-                    {
-                        root = x,
-                        battery = battery,
-                        connected = connected
-                    }
-                    ));
+                PopulateTree(plugin);
             }
         }
 
         private void button5_Click(object sender, EventArgs e)
         {
-            string current = treeView1.SelectedNode.Text;
+            string current = treeView1.SelectedNode.Name.Split("/").First().Trim();
+            Log($"{current}");
             if (string.IsNullOrEmpty(current)) return;
 
-            IPlugin? plugin = PluginLoader.Loaded.FirstOrDefault(x => x.Information.Name == current);
+            IPlugin? plugin = PluginLoader.Loaded.FirstOrDefault(x => x.Information.InternalName == current);
 
             if (plugin != null)
             {
                 plugin.OpenUI();
             }
+        }
+
+        private void tabPage3_Click(object sender, EventArgs e)
+        {
+
         }
     }
 }

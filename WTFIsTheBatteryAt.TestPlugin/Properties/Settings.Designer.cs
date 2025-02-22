@@ -8,7 +8,7 @@
 // </auto-generated>
 //------------------------------------------------------------------------------
 
-namespace WTFIsTheBatteryAt.TestPlugin.Properties {
+namespace WTFIsTheBatteryAt.DualSensePlugin.Properties {
     
     
     [global::System.Runtime.CompilerServices.CompilerGeneratedAttribute()]

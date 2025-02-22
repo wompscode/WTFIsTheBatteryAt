@@ -30,9 +30,9 @@
         {
             components = new System.ComponentModel.Container();
             System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(Form1));
-            TreeNode treeNode4 = new TreeNode("Percentage: 50");
-            TreeNode treeNode5 = new TreeNode("Connected");
-            TreeNode treeNode6 = new TreeNode("PluginName", new TreeNode[] { treeNode4, treeNode5 });
+            TreeNode treeNode1 = new TreeNode("Percentage: 50");
+            TreeNode treeNode2 = new TreeNode("Connected");
+            TreeNode treeNode3 = new TreeNode("PluginName", new TreeNode[] { treeNode1, treeNode2 });
             numericUpDown1 = new NumericUpDown();
             button1 = new Button();
             label1 = new Label();
@@ -60,6 +60,7 @@
             label3 = new Label();
             numericUpDown2 = new NumericUpDown();
             tabPage3 = new TabPage();
+            button5 = new Button();
             button4 = new Button();
             button3 = new Button();
             treeView1 = new TreeView();
@@ -71,7 +72,6 @@
             fontDialog1 = new FontDialog();
             colorDialog2 = new ColorDialog();
             checkBox2 = new CheckBox();
-            button5 = new Button();
             ((System.ComponentModel.ISupportInitialize)numericUpDown1).BeginInit();
             ((System.ComponentModel.ISupportInitialize)pictureBox1).BeginInit();
             tabControl1.SuspendLayout();
@@ -118,7 +118,8 @@
             // 
             // updateTimer
             // 
-            updateTimer.Interval = 12000;
+            updateTimer.Enabled = true;
+            updateTimer.Interval = 3500;
             updateTimer.Tick += updateTimer_Tick;
             // 
             // notifyIcon1
@@ -359,6 +360,17 @@
             tabPage3.TabIndex = 2;
             tabPage3.Text = "tabPage3";
             tabPage3.UseVisualStyleBackColor = true;
+            tabPage3.Click += tabPage3_Click;
+            // 
+            // button5
+            // 
+            button5.Location = new Point(193, 147);
+            button5.Name = "button5";
+            button5.Size = new Size(129, 32);
+            button5.TabIndex = 3;
+            button5.Text = "Open Plugin UI";
+            button5.UseVisualStyleBackColor = true;
+            button5.Click += button5_Click;
             // 
             // button4
             // 
@@ -384,13 +396,13 @@
             // 
             treeView1.Location = new Point(6, 3);
             treeView1.Name = "treeView1";
-            treeNode4.Name = "Node1";
-            treeNode4.Text = "Percentage: 50";
-            treeNode5.Name = "Node2";
-            treeNode5.Text = "Connected";
-            treeNode6.Name = "Node0";
-            treeNode6.Text = "PluginName";
-            treeView1.Nodes.AddRange(new TreeNode[] { treeNode6 });
+            treeNode1.Name = "Node1";
+            treeNode1.Text = "Percentage: 50";
+            treeNode2.Name = "Node2";
+            treeNode2.Text = "Connected";
+            treeNode3.Name = "Node0";
+            treeNode3.Text = "PluginName";
+            treeView1.Nodes.AddRange(new TreeNode[] { treeNode3 });
             treeView1.Size = new Size(181, 176);
             treeView1.TabIndex = 0;
             // 
@@ -435,16 +447,6 @@
             checkBox2.Size = new Size(15, 14);
             checkBox2.TabIndex = 20;
             checkBox2.UseVisualStyleBackColor = true;
-            // 
-            // button5
-            // 
-            button5.Location = new Point(193, 147);
-            button5.Name = "button5";
-            button5.Size = new Size(129, 32);
-            button5.TabIndex = 3;
-            button5.Text = "Open Plugin UI";
-            button5.UseVisualStyleBackColor = true;
-            button5.Click += button5_Click;
             // 
             // Form1
             // 
